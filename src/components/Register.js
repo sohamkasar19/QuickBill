@@ -1,12 +1,24 @@
 import React, {useState} from 'react';
 import {View, TextInput, Button, Alert} from 'react-native';
+import firebase from 'firebase';
 
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const onRegister = () => {
-    // later
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(userCredential => {
+        // The user has been registered and is signed in!
+        var user = userCredential.user;
+        console.log('User registered: ', user);
+      })
+      .catch(error => {
+        // Handle any errors here
+        console.error(error);
+      });
   };
 
   return (
