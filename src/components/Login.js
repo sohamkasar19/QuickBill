@@ -19,7 +19,8 @@ const Login = ({navigation}) => {
       .then(userCredential => {
         // The user is signed in
         var user = userCredential.user;
-        console.log('User logged in: ', user);
+        console.log('User logged in: ', user.email);
+        navigation.navigate('Home');
       })
       .catch(error => {
         // Handle any errors here
