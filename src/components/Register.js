@@ -1,19 +1,19 @@
 import React, {useState} from 'react';
-import {View, TextInput, Button, Alert} from 'react-native';
-import firebase from 'firebase';
+import {View, TextInput, Button, StyleSheet} from 'react-native';
+
+import {auth} from '../../firebase';
 
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const onRegister = () => {
-    firebase
-      .auth()
+    auth
       .createUserWithEmailAndPassword(email, password)
       .then(userCredential => {
         // The user has been registered and is signed in!
         var user = userCredential.user;
-        console.log('User registered: ', user);
+        console.log('User registered: ', user.email);
       })
       .catch(error => {
         // Handle any errors here
@@ -22,17 +22,36 @@ const Register = () => {
   };
 
   return (
-    <View>
-      <TextInput placeholder="Email" value={email} onChangeText={setEmail} />
+    <View style={styles.container}>
       <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
+        style={styles.input}
+        placeholder="Email"
+        onChangeText={setEmail}
       />
-      <Button title="Register" onPress={onRegister} />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        secureTextEntry={true}
+        onChangeText={setPassword}
+      />
+      <Button onPress={onRegister} title="Register" />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 16,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingLeft: 8,
+  },
+});
 
 export default Register;
