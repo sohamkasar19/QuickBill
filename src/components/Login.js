@@ -7,14 +7,15 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import {auth} from '../../firebase';
+// import {auth} from '../../firebase';
+import auth from '@react-native-firebase/auth';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const onLogin = () => {
-    auth
+    auth()
       .signInWithEmailAndPassword(email, password)
       .then(userCredential => {
         // The user is signed in

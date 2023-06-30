@@ -1,11 +1,12 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import {auth} from '../../firebase';
+import auth from '@react-native-firebase/auth';
+// import {auth} from '../../firebase';
 
 const HomeScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.welcome}>Welcome, {auth.currentUser.email}!</Text>
+      <Text style={styles.welcome}>Welcome, {auth().currentUser.email}!</Text>
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate('NewOrderScreen')}>

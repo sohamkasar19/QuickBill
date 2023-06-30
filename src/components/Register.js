@@ -1,14 +1,15 @@
 import React, {useState} from 'react';
 import {View, TextInput, Button, StyleSheet} from 'react-native';
+import auth from '@react-native-firebase/auth';
 
-import {auth} from '../../firebase';
+// import {auth} from '../../firebase';
 
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const onRegister = () => {
-    auth
+    auth()
       .createUserWithEmailAndPassword(email, password)
       .then(userCredential => {
         // The user has been registered and is signed in!
