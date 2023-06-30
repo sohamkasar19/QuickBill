@@ -6,8 +6,9 @@ import DetailsScreen from './src/screens/DetailsScreen.js';
 import Login from './src/components/Login.js';
 import Register from './src/components/Register.js';
 import {ActivityIndicator, View} from 'react-native';
-import NewOrderScreen from './src/screens/NewOrderScreen.js';
 import auth from '@react-native-firebase/auth';
+import SelectPartyScreen from './src/screens/SelectPartyScreen.js';
+import AddProductsScreen from './src/screens/AddProductScreen.js';
 
 const Stack = createStackNavigator();
 
@@ -48,14 +49,8 @@ export default function App() {
           <Stack.Screen name="Login" component={Login} />
         )}
         <Stack.Screen name="Register" component={Register} />
-        {/* <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{
-            headerLeft: () => <View></View>,
-          }}
-        /> */}
-        <Stack.Screen name="NewOrderScreen" component={NewOrderScreen} />
+        <Stack.Screen name="Select Party" component={SelectPartyScreen} />
+        <Stack.Screen name="Add Products" component={AddProductsScreen} />
         <Stack.Screen name="Details" component={DetailsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
