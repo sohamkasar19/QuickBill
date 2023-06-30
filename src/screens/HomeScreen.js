@@ -1,15 +1,30 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import auth from '@react-native-firebase/auth';
-// import {auth} from '../../firebase';
+import firestore from '@react-native-firebase/firestore';
 
 const HomeScreen = ({navigation}) => {
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userDocument = await firestore()
+        .collection('users')
+        .doc(auth().currentUser.uid)
+        .get();
+
+      setUserName(userDocument.data().name);
+    };
+
+    fetchUserData();
+  }, []);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.welcome}>Welcome, {auth().currentUser.email}!</Text>
+      <Text style={styles.welcome}>Welcome, {userName}!</Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('NewOrderScreen')}>
+        onPress={() => navigation.navigate('Select Party')}>
         <Text style={styles.buttonText}>Create New Order</Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -19,7 +34,7 @@ const HomeScreen = ({navigation}) => {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.logoutButton}
-        onPress={() => auth.signOut()}>
+        onPress={() => auth().signOut()}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
     </View>
