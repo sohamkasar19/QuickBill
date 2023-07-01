@@ -9,16 +9,16 @@ import {
 } from 'react-native';
 import {useForm, Controller} from 'react-hook-form';
 
-const SelectPartyScreen = ({navigation}) => {
+const SelectDealerScreen = ({navigation}) => {
   const {control, handleSubmit} = useForm();
 
   const onSubmit = data => {
-    navigation.navigate('Add Products', {party: data.party});
+    navigation.navigate('Add Products', {dealer: data.dealer});
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Party</Text>
+      <Text style={styles.label}>Dealer</Text>
       <Controller
         control={control}
         render={({field: {onChange, value}}) => (
@@ -26,10 +26,10 @@ const SelectPartyScreen = ({navigation}) => {
             style={styles.input}
             onChangeText={onChange}
             value={value}
-            placeholder="Enter Party Name"
+            placeholder="Enter Dealer Name"
           />
         )}
-        name="party"
+        name="dealer"
         defaultValue=""
       />
       <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
@@ -76,4 +76,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SelectPartyScreen;
+export default SelectDealerScreen;

@@ -5,6 +5,7 @@ import firestore from '@react-native-firebase/firestore';
 
 const HomeScreen = ({navigation}) => {
   const [userName, setUserName] = useState('');
+  const [role, setRole] = useState('user');
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -15,7 +16,14 @@ const HomeScreen = ({navigation}) => {
 
       setUserName(userDocument.data().name);
     };
-
+    const fetchRole = async () => {
+      const user = auth().currentUser;
+      if (user) {
+        const doc = await firestore().collection('users').doc(user.uid).get();
+        setRole(doc.data().role);
+      }
+    };
+    fetchRole();
     fetchUserData();
   }, []);
 
@@ -24,7 +32,7 @@ const HomeScreen = ({navigation}) => {
       <Text style={styles.welcome}>Welcome, {userName}!</Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('Select Party')}>
+        onPress={() => navigation.navigate('Select Dealer')}>
         <Text style={styles.buttonText}>Create New Order</Text>
       </TouchableOpacity>
       <TouchableOpacity
@@ -32,6 +40,20 @@ const HomeScreen = ({navigation}) => {
         onPress={() => navigation.navigate('PastOrders')}>
         <Text style={styles.buttonText}>View Past Orders</Text>
       </TouchableOpacity>
+      {role === 'admin' && (
+        <>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate('Select Dealer')}>
+            <Text style={styles.buttonText}>Products</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate('PastOrders')}>
+            <Text style={styles.buttonText}>Parties</Text>
+          </TouchableOpacity>
+        </>
+      )}
       <TouchableOpacity
         style={styles.logoutButton}
         onPress={() => auth().signOut()}>

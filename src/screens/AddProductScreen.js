@@ -13,7 +13,7 @@ import firestore from '@react-native-firebase/firestore';
 const AddProductsScreen = ({route, navigation}) => {
   const {control, handleSubmit, reset} = useForm();
   const [order, setOrder] = useState({
-    party: route.params.party,
+    dealer: route.params.dealer,
     products: [],
   });
 
@@ -30,7 +30,7 @@ const AddProductsScreen = ({route, navigation}) => {
     // try {
     //   await firestore().collection('orders').add(order);
     //   console.log('Order added!');
-    //   setOrder({party: '', products: []});
+    //   setOrder({dealer: '', products: []});
     //   navigation.navigate('Home');
     // } catch (error) {
     //   console.error('Failed to add order: ', error);
