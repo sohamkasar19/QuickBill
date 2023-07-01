@@ -9,6 +9,7 @@ import {ActivityIndicator, View} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import SelectDealerScreen from './src/screens/SelectDealerScreen.js';
 import AddProductsScreen from './src/screens/AddProductScreen.js';
+import DealersScreen from './src/screens/DealersScreen.js';
 
 const Stack = createStackNavigator();
 
@@ -52,6 +53,7 @@ export default function App() {
         <Stack.Screen name="Select Dealer" component={SelectDealerScreen} />
         <Stack.Screen name="Add Products" component={AddProductsScreen} />
         <Stack.Screen name="Details" component={DetailsScreen} />
+        <Stack.Screen name="Dealers" component={DealersScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

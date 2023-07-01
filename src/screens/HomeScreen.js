@@ -49,8 +49,8 @@ const HomeScreen = ({navigation}) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate('PastOrders')}>
-            <Text style={styles.buttonText}>Parties</Text>
+            onPress={() => navigation.navigate('Dealers')}>
+            <Text style={styles.buttonText}>Dealers</Text>
           </TouchableOpacity>
         </>
       )}
