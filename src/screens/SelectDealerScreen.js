@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Button,
   View,
@@ -6,33 +6,64 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
-import {useForm, Controller} from 'react-hook-form';
+import DropDownPicker from 'react-native-dropdown-picker';
+import firestore from '@react-native-firebase/firestore';
 
 const SelectDealerScreen = ({navigation}) => {
-  const {control, handleSubmit} = useForm();
+  const [dealers, setDealers] = useState([]);
+  const [selectedDealer, setSelectedDealer] = useState(null);
 
   const onSubmit = data => {
-    navigation.navigate('Add Products', {dealer: data.dealer});
+    if (selectedDealer === null) {
+      Alert.alert(
+        'No Dealer Selected',
+        'Please select a dealer before proceeding.',
+      );
+      return;
+    }
+    navigation.navigate('Add Products', {dealer: selectedDealer});
+    // console.log(selectedDealer);
   };
+
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const getDealers = async () => {
+      const snapshot = await firestore().collection('dealers').get();
+      let dealersData = [];
+      snapshot.forEach(doc => {
+        dealersData.push({
+          id: doc.id,
+          ...doc.data(),
+        });
+      });
+      setDealers(dealersData);
+    };
+    getDealers();
+  }, []);
 
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Dealer</Text>
-      <Controller
-        control={control}
-        render={({field: {onChange, value}}) => (
-          <TextInput
-            style={styles.input}
-            onChangeText={onChange}
-            value={value}
-            placeholder="Enter Dealer Name"
-          />
-        )}
-        name="dealer"
-        defaultValue=""
+      <DropDownPicker
+        open={open}
+        value={selectedDealer}
+        items={dealers}
+        schema={{
+          label: 'DealerName',
+          value: 'DealerCode',
+        }}
+        setOpen={setOpen}
+        setValue={setSelectedDealer}
+        setItems={setDealers}
+        searchable={true}
+        placeholder="Select a Dealer"
+        loading={loading}
       />
-      <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>
+      <TouchableOpacity style={styles.button} onPress={onSubmit}>
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>
     </View>
@@ -69,6 +100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 5,
     marginBottom: 10,
+    marginTop: 20,
   },
   buttonText: {
     color: 'white',
