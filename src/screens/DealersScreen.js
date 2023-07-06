@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import {Icon, SearchBar} from 'react-native-elements';
+// import {Icon, SearchBar} from 'react-native-elements';
 
 const DealersScreen = () => {
   const [dealers, setDealers] = useState([]);
@@ -32,7 +32,7 @@ const DealersScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <SearchBar
           placeholder="Search Dealers"
           onChangeText={handleSearch}
@@ -40,7 +40,7 @@ const DealersScreen = () => {
           containerStyle={styles.searchBar}
           inputStyle={styles.searchInput}
         />
-      </View>
+      </View> */}
       {/* {dealers.map(dealer => (
         <TouchableOpacity
           key={dealer.id}
