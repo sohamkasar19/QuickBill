@@ -9,10 +9,12 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
+import CheckBox from '@react-native-community/checkbox';
 import firestore from '@react-native-firebase/firestore';
 import {Table, Row, TableWrapper, Cell} from 'react-native-table-component';
 import DropDownPicker from 'react-native-dropdown-picker';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const AddProductsScreen = ({route, navigation}) => {
   const [order, setOrder] = useState({
@@ -21,9 +23,11 @@ const AddProductsScreen = ({route, navigation}) => {
   });
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [quantity, setQuantity] = useState(0);
+  const [quantity, setQuantity] = useState();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [freeItems, setFreeItems] = useState(false);
+  const [freeSample, setFreeSample] = useState(false);
 
   useEffect(() => {
     const getDealerName = async DealerCode => {
@@ -77,10 +81,17 @@ const AddProductsScreen = ({route, navigation}) => {
       );
       return;
     }
+
+    const productType = freeItems
+      ? 'Free Item'
+      : freeSample
+      ? 'Free Sample'
+      : 'Regular';
+
     setOrder(prevOrder => {
-      const existingProductIndex = prevOrder.products.findIndex(
-        product => product.name === selectedProduct,
-      );
+      const existingProductIndex = prevOrder.products.findIndex(product => {
+        product.name === selectedProduct && product.type === productType;
+      });
 
       if (existingProductIndex >= 0) {
         // Product already exists, so update its quantity
@@ -93,20 +104,21 @@ const AddProductsScreen = ({route, navigation}) => {
           ...prevOrder,
           products: [
             ...prevOrder.products,
-            {name: selectedProduct, quantity: quantity},
+            {name: selectedProduct, quantity: quantity, type: productType},
           ],
         };
       }
     });
     setSelectedProduct(null);
-    setQuantity(0);
+    setQuantity();
     console.log(selectedProduct, quantity);
   };
 
-  const onDeleteProduct = productName => {
+  const onDeleteProduct = (productName, productType) => {
     setOrder(prevOrder => {
       const updatedProducts = prevOrder.products.filter(
-        product => product.name !== productName,
+        product =>
+          !(product.name === productName && product.type === productType),
       );
       return {...prevOrder, products: updatedProducts};
     });
@@ -122,7 +134,15 @@ const AddProductsScreen = ({route, navigation}) => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.dealerText}>Dealer: {order.dealer}</Text>
+      {/* <Text style={styles.dealerText}>Dealer: {order.dealer}</Text> */}
+      <View style={styles.topContainer}>
+        <Text style={styles.dealerText}>Dealer: {order.dealer}</Text>
+        <TouchableOpacity style={styles.submitButton} onPress={onOrderSubmit}>
+          <Text style={styles.buttonText}>Review</Text>
+          <MaterialIcons name="navigate-next" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
+
       <DropDownPicker
         open={open}
         value={selectedProduct}
@@ -145,13 +165,39 @@ const AddProductsScreen = ({route, navigation}) => {
         value={quantity}
         keyboardType="number-pad"
       />
+      <View style={styles.checkboxContainer}>
+        <CheckBox
+          value={freeItems}
+          onValueChange={newValue => {
+            setFreeItems(newValue);
+            if (newValue) {
+              setFreeSample(false);
+            }
+          }}
+          style={styles.checkbox}
+        />
+        <Text style={styles.checkboxlabel}>Free Items</Text>
+        {/* </View>
+      <View style={styles.checkboxContainer}> */}
+        <CheckBox
+          value={freeSample}
+          onValueChange={newValue => {
+            setFreeSample(newValue);
+            if (newValue) {
+              setFreeItems(false);
+            }
+          }}
+          style={styles.checkbox}
+        />
+        <Text style={styles.checkboxlabel}>Free Sample Not for Sale</Text>
+      </View>
       <TouchableOpacity style={styles.button} onPress={onAddProduct}>
         <Text style={styles.buttonText}>Add Product</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={onOrderSubmit}>
+      {/* <TouchableOpacity style={styles.button} onPress={onOrderSubmit}>
         <Text style={styles.buttonText}>Submit Order</Text>
-      </TouchableOpacity>
-      {order.products.length == 0 ? (
+      </TouchableOpacity> */}
+      {order.products.length === 0 ? (
         <></>
       ) : (
         <>
@@ -182,7 +228,9 @@ const AddProductsScreen = ({route, navigation}) => {
                   />
                   <Cell
                     flex={1}
-                    data={mrp.toString()}
+                    data={
+                      product.type === 'Regular' ? mrp.toString() : product.type
+                    }
                     textStyle={styles.text}
                   />
                   <Cell
@@ -190,7 +238,9 @@ const AddProductsScreen = ({route, navigation}) => {
                     data={
                       <TouchableOpacity
                         style={styles.deleteIcon}
-                        onPress={() => onDeleteProduct(product.name)}>
+                        onPress={() =>
+                          onDeleteProduct(product.name, product.type)
+                        }>
                         <FontAwesome name="trash-o" size={24} />
                       </TouchableOpacity>
                     }
@@ -210,8 +260,13 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  topContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   dealerText: {
-    fontSize: 18,
+    fontSize: 16,
     marginBottom: 20,
   },
   label: {
@@ -244,6 +299,25 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
+    fontSize: 15,
+  },
+  submitButton: {
+    marginBottom: 20,
+    flexDirection: 'row',
+    backgroundColor: '#3897f1',
+    padding: 8,
+    borderRadius: 5,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  checkbox: {
+    alignSelf: 'center',
+    color: '#3897f1',
+  },
+  checkboxlabel: {
+    margin: 8,
     fontSize: 15,
   },
 });
