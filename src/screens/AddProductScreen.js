@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {
-  Button,
   View,
   Text,
   TextInput,
@@ -28,6 +27,7 @@ const AddProductsScreen = ({route, navigation}) => {
   const [loading, setLoading] = useState(false);
   const [freeItems, setFreeItems] = useState(false);
   const [freeSample, setFreeSample] = useState(false);
+  const [dealerData, setDealerData] = useState(null);
 
   useEffect(() => {
     const getDealerName = async DealerCode => {
@@ -40,6 +40,7 @@ const AddProductsScreen = ({route, navigation}) => {
         if (!querySnapshot.empty) {
           const dealerDoc = querySnapshot.docs[0];
           dealerName = dealerDoc.data().DealerName;
+          setDealerData(dealerDoc.data());
           setOrder(prevOrder => ({
             ...prevOrder,
             dealer: dealerName,
@@ -125,7 +126,31 @@ const AddProductsScreen = ({route, navigation}) => {
   };
 
   const onOrderSubmit = async () => {
-    // your order submit code...
+    if (order.products.length === 0) {
+      Alert.alert(
+        'No Products',
+        'Please add at least one product to the order before reviewing.',
+      );
+      return;
+    }
+    let updatedProductList = order.products.map(prod => {
+      let productObject = products.find(obj => obj.ItemName === prod.name);
+      if (productObject) {
+        return {
+          product: productObject,
+          quantity: prod.quantity,
+          type: prod.type,
+        };
+      } else {
+        return prod;
+      }
+    });
+    navigation.navigate('Review Order', {
+      order: {
+        dealer: dealerData,
+        productList: updatedProductList,
+      },
+    });
   };
 
   const onChangeQuantity = text => {
