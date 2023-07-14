@@ -37,7 +37,7 @@ const HomeScreen = ({navigation}) => {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('PastOrders')}>
+        onPress={() => navigation.navigate('Past Orders')}>
         <Text style={styles.buttonText}>View Past Orders</Text>
       </TouchableOpacity>
       {role === 'admin' && (

@@ -8,21 +8,23 @@ import {
 } from 'react-native';
 import {Table, Row, TableWrapper, Cell} from 'react-native-table-component';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import {generateHTML} from '../components/GenerateHTML';
+import {generateHTML} from '../util/GenerateHTML';
 import firestore from '@react-native-firebase/firestore';
-import 'react-native-get-random-values';
-import {v4 as uuidv4} from 'uuid';
+import auth from '@react-native-firebase/auth';
+import {generateOrderId} from '../util/GenerateOrderId';
 
 const OrderReviewScreen = ({route, navigation}) => {
   const {order} = route.params;
 
   const submitOrder = async () => {
     try {
-      const orderId = uuidv4();
+      const orderId = generateOrderId();
+      console.log('orderId', orderId);
       await firestore().collection('orders').add({
         orderId: orderId,
         dealer: order.dealer,
         products: order.productList,
+        created_by: auth().currentUser.uid,
         created_at: firestore.FieldValue.serverTimestamp(),
       });
 
