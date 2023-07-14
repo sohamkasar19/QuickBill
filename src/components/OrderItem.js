@@ -10,31 +10,21 @@ function OrderItem({order}) {
     'en-IN',
     {timeZone: 'Asia/Kolkata'},
   );
-  const onEditPress = () => {
-    navigation.navigate('Add Products', {order: order});
+
+  const onItemPress = () => {
+    navigation.navigate('Order Details', {order: order});
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.orderId}>Order ID: {order.orderId}</Text>
-      <Text style={styles.dealerName}>
-        Dealer Name: {order.dealer.DealerName}
-      </Text>
-      <Text style={styles.date}>Created At: {createdAt}</Text>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.button, styles.editButton]}
-          onPress={onEditPress}>
-          <Icon name="pencil-outline" size={20} color="white" />
-          <Text style={styles.buttonText}>Edit</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={[styles.button, styles.deleteButton]}>
-          <Icon name="trash-outline" size={20} color="white" />
-          <Text style={styles.buttonText}>Delete</Text>
-        </TouchableOpacity>
+    <TouchableOpacity onPress={onItemPress}>
+      <View style={styles.container}>
+        <Text style={styles.orderId}>Order ID: {order.orderId}</Text>
+        <Text style={styles.dealerName}>
+          Dealer Name: {order.dealer.DealerName}
+        </Text>
+        <Text style={styles.date}>Created At: {createdAt}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
