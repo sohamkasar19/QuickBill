@@ -18,15 +18,27 @@ const OrderReviewScreen = ({route, navigation}) => {
 
   const submitOrder = async () => {
     try {
-      const orderId = generateOrderId();
-      console.log('orderId', orderId);
-      await firestore().collection('orders').add({
-        orderId: orderId,
-        dealer: order.dealer,
-        products: order.productList,
-        created_by: auth().currentUser.uid,
-        created_at: firestore.FieldValue.serverTimestamp(),
-      });
+      const orderId = order.orderId ? order.orderId : generateOrderId();
+      // await firestore().collection('orders').add({
+      //   orderId: orderId,
+      //   dealer: order.dealer,
+      //   products: order.productList,
+      //   created_by: auth().currentUser.uid,
+      //   created_at: firestore.FieldValue.serverTimestamp(),
+      // });
+
+      const orderRef = firestore().collection('orders').doc(orderId);
+
+      orderRef.set(
+        {
+          orderId: orderId,
+          dealer: order.dealer,
+          products: order.productList,
+          created_by: auth().currentUser.uid,
+          created_at: firestore.FieldValue.serverTimestamp(),
+        },
+        {merge: true},
+      );
 
       createPDF(orderId);
     } catch (error) {
@@ -48,7 +60,14 @@ const OrderReviewScreen = ({route, navigation}) => {
         directory: 'Orders',
       };
       const pdf = await RNHTMLtoPDF.convert(options);
-      Alert.alert('Success', `PDF saved to ${pdf.filePath}`);
+      Alert.alert('Success', `PDF saved to ${pdf.filePath}`, [
+        {
+          text: 'OK',
+          onPress: () => {
+            navigation.navigate('Home');
+          },
+        },
+      ]);
 
       // pdf.filePath is the path to the PDF
       console.log(pdf.filePath);

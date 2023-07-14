@@ -30,42 +30,66 @@ const AddProductsScreen = ({route, navigation}) => {
   const [dealerData, setDealerData] = useState(null);
 
   useEffect(() => {
-    const getDealerName = async DealerCode => {
-      try {
-        const querySnapshot = await firestore()
-          .collection('dealers')
-          .where('DealerCode', '==', DealerCode)
-          .get();
-        let dealerName = '';
-        if (!querySnapshot.empty) {
-          const dealerDoc = querySnapshot.docs[0];
-          dealerName = dealerDoc.data().DealerName;
-          setDealerData(dealerDoc.data());
-          setOrder(prevOrder => ({
-            ...prevOrder,
-            dealer: dealerName,
-          }));
-        } else {
-          console.log('No such dealer!');
-        }
-      } catch (error) {
-        console.error('Failed to get dealer: ', error);
-      }
-    };
-    const getProducts = async () => {
-      const snapshot = await firestore().collection('products').get();
-      let productsData = [];
-      snapshot.forEach(doc => {
-        productsData.push({
-          id: doc.id,
-          ...doc.data(),
-        });
-      });
-      setProducts(productsData);
-    };
-    getDealerName(route.params.dealer);
+    if (route.params.dealer) {
+      getDealerName(route.params.dealer);
+    }
+    if (route.params.order) {
+      let newOrderFormat = convertOrderFormat(route.params.order);
+      setOrder(newOrderFormat);
+      setDealerData(route.params.order.dealer);
+    }
     getProducts();
   }, []);
+
+  const getDealerName = async DealerCode => {
+    try {
+      const querySnapshot = await firestore()
+        .collection('dealers')
+        .where('DealerCode', '==', DealerCode)
+        .get();
+      let dealerName = '';
+      if (!querySnapshot.empty) {
+        const dealerDoc = querySnapshot.docs[0];
+        dealerName = dealerDoc.data().DealerName;
+        setDealerData(dealerDoc.data());
+        setOrder(prevOrder => ({
+          ...prevOrder,
+          dealer: dealerName,
+        }));
+      } else {
+        console.log('No such dealer!');
+      }
+    } catch (error) {
+      console.error('Failed to get dealer: ', error);
+    }
+  };
+
+  const getProducts = async () => {
+    const snapshot = await firestore().collection('products').get();
+    let productsData = [];
+    snapshot.forEach(doc => {
+      productsData.push({
+        id: doc.id,
+        ...doc.data(),
+      });
+    });
+    setProducts(productsData);
+  };
+
+  const convertOrderFormat = orderFromParams => {
+    const newProducts = orderFromParams.products.map(productObject => ({
+      name: productObject.product.ItemName,
+      quantity: productObject.quantity,
+      type: productObject.type,
+    }));
+
+    const newOrder = {
+      dealer: orderFromParams.dealer.DealerName,
+      products: newProducts,
+    };
+
+    return newOrder;
+  };
 
   const onAddProduct = () => {
     if (!selectedProduct) {
@@ -161,6 +185,7 @@ const AddProductsScreen = ({route, navigation}) => {
       order: {
         dealer: dealerData,
         productList: updatedProductList,
+        ...(route.params.order && {orderId: route.params.order.orderId}),
       },
     });
   };

@@ -1,13 +1,18 @@
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useNavigation} from '@react-navigation/native';
 
 function OrderItem({order}) {
-  // Convert timestamp to Date object and format it to a readable string
+  const navigation = useNavigation();
+
   const createdAt = new Date(order.created_at.seconds * 1000).toLocaleString(
     'en-IN',
     {timeZone: 'Asia/Kolkata'},
   );
+  const onEditPress = () => {
+    navigation.navigate('Add Products', {order: order});
+  };
 
   return (
     <View style={styles.container}>
@@ -17,7 +22,9 @@ function OrderItem({order}) {
       </Text>
       <Text style={styles.date}>Created At: {createdAt}</Text>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={[styles.button, styles.editButton]}>
+        <TouchableOpacity
+          style={[styles.button, styles.editButton]}
+          onPress={onEditPress}>
           <Icon name="pencil-outline" size={20} color="white" />
           <Text style={styles.buttonText}>Edit</Text>
         </TouchableOpacity>
