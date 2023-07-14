@@ -83,6 +83,16 @@ const AddProductsScreen = ({route, navigation}) => {
       return;
     }
 
+    let product = products.find(obj => obj.ItemName === selectedProduct);
+    console.log('inside on add', product);
+    if (quantity % product.Unit !== 0) {
+      Alert.alert(
+        'Invalid Quantity',
+        `Quantity must be a multiple of the product unit (${product.Unit}).`,
+      );
+      return;
+    }
+
     const productType = freeItems
       ? 'Free Item'
       : freeSample
@@ -112,6 +122,8 @@ const AddProductsScreen = ({route, navigation}) => {
     });
     setSelectedProduct(null);
     setQuantity();
+    setFreeItems(false);
+    setFreeSample(false);
     console.log(selectedProduct, quantity);
   };
 

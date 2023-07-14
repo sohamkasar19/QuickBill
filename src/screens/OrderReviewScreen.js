@@ -9,17 +9,40 @@ import {
 import {Table, Row, TableWrapper, Cell} from 'react-native-table-component';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import {generateHTML} from '../components/GenerateHTML';
+import firestore from '@react-native-firebase/firestore';
+import 'react-native-get-random-values';
+import {v4 as uuidv4} from 'uuid';
 
 const OrderReviewScreen = ({route, navigation}) => {
   const {order} = route.params;
 
-  const createPDF = async () => {
+  const submitOrder = async () => {
     try {
-      const html = generateHTML(order);
+      const orderId = uuidv4();
+      await firestore().collection('orders').add({
+        orderId: orderId,
+        dealer: order.dealer,
+        products: order.productList,
+        created_at: firestore.FieldValue.serverTimestamp(),
+      });
+
+      createPDF(orderId);
+    } catch (error) {
+      console.error('Failed to save order with error: ', error);
+      Alert.alert('Error', 'Failed to save order');
+    }
+  };
+
+  const createPDF = async orderId => {
+    try {
+      const html = generateHTML(orderId, order);
+
+      const currentDate = new Date();
+      const dateStr = currentDate.toISOString().replace(/[:.]/g, '-');
 
       const options = {
         html,
-        fileName: 'order2',
+        fileName: `order_${order.dealer.DealerName}_${dateStr}`,
         directory: 'Orders',
       };
       const pdf = await RNHTMLtoPDF.convert(options);
@@ -81,7 +104,7 @@ const OrderReviewScreen = ({route, navigation}) => {
         </>
       )}
 
-      <TouchableOpacity style={styles.button} onPress={createPDF}>
+      <TouchableOpacity style={styles.button} onPress={submitOrder}>
         <Text style={styles.buttonText}>Create Order</Text>
       </TouchableOpacity>
     </ScrollView>

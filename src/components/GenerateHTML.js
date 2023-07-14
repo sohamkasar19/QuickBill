@@ -1,7 +1,6 @@
-export const generateHTML = order => {
+export const generateHTML = (orderId, order) => {
   let dealerDetails = order.dealer;
   let productList = order.productList;
-  order.id = 1;
 
   const today = new Date();
   const yyyy = today.getFullYear();
@@ -139,7 +138,7 @@ export const generateHTML = order => {
             class="s1"
             style="padding-left: 1pt; text-indent: 0pt; text-align: left"
           >
-            Order No. : ${order.id}
+            Order No. : ${orderId}
           </p>
           <p style="text-indent: 0pt; text-align: left"><br /></p>
           <p
@@ -325,7 +324,7 @@ export const generateHTML = order => {
               text-align: left;
             "
           >
-           ${dealerDetails.Address1}
+           ${dealerDetails.Address1 ? dealerDetails.Address1 : ''}
           </p>
           <p
             class="s1"
@@ -336,7 +335,7 @@ export const generateHTML = order => {
               text-align: left;
             "
           >
-          ${dealerDetails.Address2}
+          ${dealerDetails.Address2 ? dealerDetails.Address2 : ''}
           </p>
           <p
             class="s2"
@@ -348,7 +347,7 @@ export const generateHTML = order => {
               text-align: left;
             "
           >
-          ${dealerDetails.Address3}
+          ${dealerDetails.Address3 ? dealerDetails.Address3 : ''}
           </p>
         </td>
       </tr>
@@ -693,23 +692,30 @@ export const generateHTML = order => {
   productList.forEach(productData => {
     const currProduct = productData.product;
     const noOfUnits = productData.quantity / currProduct.Unit;
-    const grossAmount = currProduct.MRP * noOfUnits;
-    const discountAmount =
-      grossAmount * (dealerDetails.discount ? dealerDetails.Discount / 100 : 0);
-    const taxableAmount = grossAmount - discountAmount;
-    const gstAmount = 0;
-    const totalAmount = taxableAmount + gstAmount;
+    productData.quantity = parseFloat(productData.quantity, 10).toFixed(2);
+    const grossAmount = (currProduct.MRP * noOfUnits).toFixed(2);
+    const discountAmount = parseFloat(
+      grossAmount * (dealerDetails.Discount ? dealerDetails.Discount / 100 : 0),
+      10,
+    ).toFixed(2);
+    const taxableAmount = (grossAmount - discountAmount).toFixed(2);
+    const gstAmount = parseFloat(
+      taxableAmount * ((currProduct.GST ? currProduct.GST : 0) / 100),
+      10,
+    ).toFixed(2);
+    const totalAmount = parseFloat(taxableAmount + gstAmount, 10).toFixed(2);
 
-    totalQty += productData.quantity;
-    totalGrossAmount += grossAmount;
+    totalQty += Number(productData.quantity);
+    totalGrossAmount += Number(grossAmount);
     if (productData.type === 'Regular') {
-      totalDiscountAmount += discountAmount;
-      totalTaxableAmount += taxableAmount;
-      totalGSTAmount += gstAmount;
-      totalTotalAmount += totalAmount;
+      totalDiscountAmount += Number(discountAmount);
+      totalTaxableAmount += Number(taxableAmount);
+      totalGSTAmount += Number(gstAmount);
+      totalTotalAmount += Number(totalAmount);
     }
-    if (productData.type === 'Regular') {
-      html += `
+    console.log('type: ', productData.type);
+
+    html += `
     <tr style="height: 10pt">
         <td
           style="
@@ -853,8 +859,8 @@ export const generateHTML = order => {
           </p>
         </td>
         `;
-      if (productData.type === 'Regular') {
-        html += `
+    if (productData.type === 'Regular') {
+      html += `
         <td
           style="
             width: 24pt;
@@ -967,8 +973,8 @@ export const generateHTML = order => {
         </td>
       </tr>
       `;
-      } else if (productData.type === 'Free Sample') {
-        html += `
+    } else if (productData.type === 'Free Sample') {
+      html += `
         <td
           style="
             width: 158pt;
@@ -1008,12 +1014,17 @@ export const generateHTML = order => {
             border-right-width: 1pt;
           "
         >
-          <p style="text-indent: 0pt; text-align: left"><br /></p>
+          <p
+            class="s2"
+            style="text-indent: 0pt; line-height: 9pt; text-align: right"
+          >
+            0.00
+          </p>
         </td>
       </tr>
         `;
-      } else if (productData.type === 'Free Unit') {
-        html += `
+    } else if (productData.type === 'Free Item') {
+      html += `
         <td
           style="
             width: 158pt;
@@ -1062,7 +1073,6 @@ export const generateHTML = order => {
         </td>
       </tr>
         `;
-      }
     }
   });
   html += `
@@ -1139,7 +1149,7 @@ export const generateHTML = order => {
       class="s2"
       style="text-indent: 0pt; line-height: 9pt; text-align: right"
     >
-      ${totalQty}
+      ${totalQty.toFixed(2)}
     </p>
   </td>
   <td
@@ -1174,7 +1184,7 @@ export const generateHTML = order => {
       class="s2"
       style="text-indent: 0pt; line-height: 9pt; text-align: right"
     >
-      ${totalGrossAmount}
+      ${totalGrossAmount.toFixed(2)}
     </p>
   </td>
   <td
@@ -1209,7 +1219,7 @@ export const generateHTML = order => {
       class="s2"
       style="text-indent: 0pt; line-height: 9pt; text-align: right"
     >
-      ${totalDiscountAmount}
+      ${totalDiscountAmount.toFixed(2)}
     </p>
   </td>
   <td
@@ -1234,7 +1244,7 @@ export const generateHTML = order => {
         text-align: left;
       "
     >
-      ${totalTaxableAmount}
+      ${totalTaxableAmount.toFixed(2)}
     </p>
   </td>
   <td
@@ -1259,7 +1269,7 @@ export const generateHTML = order => {
         text-align: left;
       "
     >
-      ${totalGSTAmount}
+      ${totalGSTAmount.toFixed(2)}
     </p>
   </td>
   <td
@@ -1279,15 +1289,16 @@ export const generateHTML = order => {
       class="s2"
       style="text-indent: 0pt; line-height: 9pt; text-align: right"
     >
-      ${totalTotalAmount}
+      ${totalTotalAmount.toFixed(2)}
     </p>
   </td>
 </tr>
   `;
-  let cashDiscount =
+  let cashDiscount = (
     totalTotalAmount *
-    (dealerDetails.CashDiscount ? dealerDetails.CashDiscount / 100 : 0);
-  let invoiceAmount = totalTotalAmount - cashDiscount;
+    (dealerDetails.CashDiscount ? dealerDetails.CashDiscount / 100 : 0)
+  ).toFixed(2);
+  let invoiceAmount = (totalTotalAmount - cashDiscount).toFixed(2);
   html += `
   <tr style="height: 10pt">
         <td
