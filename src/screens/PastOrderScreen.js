@@ -10,13 +10,21 @@ function PastOrdersScreen() {
   useEffect(() => {
     const fetchOrders = async () => {
       const user = auth().currentUser;
-      const querySnapshot = await firestore()
-        .collection('orders')
-        // .where('created_by', '==', user.uid)
-        .get();
+      const userDoc = await firestore().collection('users').doc(user.uid).get();
+      const role = userDoc.data().role;
 
-      const ordersData = querySnapshot.docs.map(doc => doc.data());
-      setOrders(ordersData);
+      if (role === 'admin') {
+        const querySnapshot = await firestore().collection('orders').get();
+        const ordersData = querySnapshot.docs.map(doc => doc.data());
+        setOrders(ordersData);
+      } else {
+        const querySnapshot = await firestore()
+          .collection('orders')
+          .where('created_by', '==', user.uid)
+          .get();
+        const ordersData = querySnapshot.docs.map(doc => doc.data());
+        setOrders(ordersData);
+      }
     };
 
     fetchOrders();
