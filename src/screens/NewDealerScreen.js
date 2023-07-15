@@ -5,9 +5,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ScrollView,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import {ScrollView} from 'react-native-gesture-handler';
 
 const NewDealerScreen = ({navigation}) => {
   const [address1, setAddress1] = useState('');

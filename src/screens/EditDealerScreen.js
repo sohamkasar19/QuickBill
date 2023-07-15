@@ -5,9 +5,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ScrollView,
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
-import {ScrollView} from 'react-native-gesture-handler';
 
 const EditDealerScreen = ({route, navigation}) => {
   const {dealer} = route.params;
