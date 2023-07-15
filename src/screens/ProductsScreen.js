@@ -24,6 +24,7 @@ const ProductsScreen = ({navigation}) => {
 
   useEffect(() => {
     if (isFocused) {
+      setSelectedProduct(null);
       getProducts();
     }
   }, [isFocused]);

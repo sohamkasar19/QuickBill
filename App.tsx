@@ -16,6 +16,8 @@ import OrderDetailsScreen from './src/screens/OrderDetailsScreen.js';
 import ProductsScreen from './src/screens/ProductsScreen.js';
 import NewProductScreen from './src/screens/NewProductScreen.js';
 import EditProductScreen from './src/screens/EditProductScreen.js';
+import NewDealerScreen from './src/screens/NewDealerScreen.js';
+import EditDealerScreen from './src/screens/EditDealerScreen.js';
 
 const Stack = createStackNavigator();
 
@@ -64,8 +66,9 @@ export default function App() {
         <Stack.Screen name="Products" component={ProductsScreen} />
         <Stack.Screen name="New Product" component={NewProductScreen} />
         <Stack.Screen name="Edit Product" component={EditProductScreen} />
-        <Stack.Screen name="Details" component={DetailsScreen} />
         <Stack.Screen name="Dealers" component={DealersScreen} />
+        <Stack.Screen name="New Dealer" component={NewDealerScreen} />
+        <Stack.Screen name="Edit Dealer" component={EditDealerScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
