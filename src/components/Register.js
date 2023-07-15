@@ -21,20 +21,20 @@ const Register = ({navigation}) => {
   const onRegister = () => {
     // Check for empty fields
     if (email === '' || name === '' || password === '') {
-      alert('Please fill all fields');
+      Alert.alert('Please fill all fields');
       return;
     }
 
     // Check for valid email
     const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
     if (!emailRegex.test(email)) {
-      alert('Please enter a valid email');
+      Alert.alert('Please enter a valid email');
       return;
     }
 
     // Check for password length
     if (password.length < 6) {
-      alert('Password should be at least 6 characters');
+      Alert.alert('Password should be at least 6 characters');
       return;
     }
     auth()
@@ -64,17 +64,17 @@ const Register = ({navigation}) => {
     <View style={styles.container}>
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder="Enter email"
         onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
-        placeholder="Name"
+        placeholder="Enter full name"
         onChangeText={setName}
       />
       <TextInput
         style={styles.input}
-        placeholder="Password"
+        placeholder="Enter Password"
         secureTextEntry={true}
         onChangeText={setPassword}
       />
