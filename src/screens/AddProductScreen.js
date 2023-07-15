@@ -24,7 +24,7 @@ const AddProductsScreen = ({route, navigation}) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [quantity, setQuantity] = useState();
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [freeItems, setFreeItems] = useState(false);
   const [freeSample, setFreeSample] = useState(false);
   const [dealerData, setDealerData] = useState(null);
@@ -39,7 +39,7 @@ const AddProductsScreen = ({route, navigation}) => {
       setDealerData(route.params.order.dealer);
     }
     getProducts();
-  }, []);
+  }, [route.params.dealer, route.params.order]);
 
   const getDealerName = async DealerCode => {
     try {
@@ -124,8 +124,8 @@ const AddProductsScreen = ({route, navigation}) => {
       : 'Regular';
 
     setOrder(prevOrder => {
-      const existingProductIndex = prevOrder.products.findIndex(product => {
-        product.name === selectedProduct && product.type === productType;
+      const existingProductIndex = prevOrder.products.findIndex(prod => {
+        prod.name === selectedProduct && prod.type === productType;
       });
 
       if (existingProductIndex >= 0) {
@@ -276,12 +276,7 @@ const AddProductsScreen = ({route, navigation}) => {
               );
               const mrp = productData ? productData.MRP : 'N/A';
               return (
-                <TableWrapper
-                  key={index}
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
+                <TableWrapper key={index} style={styles.tableWrapper}>
                   <Cell flex={2} data={product.name} textStyle={styles.text} />
                   <Cell
                     flex={1.2}
@@ -381,6 +376,10 @@ const styles = StyleSheet.create({
   checkboxlabel: {
     margin: 8,
     fontSize: 15,
+  },
+  tableWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });
 
