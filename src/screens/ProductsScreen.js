@@ -40,11 +40,14 @@ const ProductsScreen = ({navigation}) => {
     setProducts(productsData);
   };
 
-  const onEditPress = () => {};
+  const onEditPress = () => {
+    const selectedProductObj = products.find(
+      prod => prod.ItemName === selectedProduct,
+    );
+    navigation.navigate('Edit Product', {product: selectedProductObj});
+  };
 
   const onDeletePress = async () => {
-    console.log(selectedProduct);
-
     Alert.alert(
       'Confirm Delete',
       'Are you sure you want to delete this product?',
