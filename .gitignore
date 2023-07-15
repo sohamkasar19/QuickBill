@@ -68,3 +68,5 @@ yarn-error.log
 
 /scripts/dealers.json
 /scripts/products.json
+
+/android/gradle.properties
