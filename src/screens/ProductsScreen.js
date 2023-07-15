@@ -11,6 +11,7 @@ import {
 import DropDownPicker from 'react-native-dropdown-picker';
 import firestore from '@react-native-firebase/firestore';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useIsFocused} from '@react-navigation/native';
 
 const ProductsScreen = ({navigation}) => {
   const [products, setProducts] = useState([]);
@@ -19,9 +20,13 @@ const ProductsScreen = ({navigation}) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
-    getProducts();
-  }, []);
+    if (isFocused) {
+      getProducts();
+    }
+  }, [isFocused]);
 
   const getProducts = async () => {
     const snapshot = await firestore().collection('products').get();
@@ -37,9 +42,83 @@ const ProductsScreen = ({navigation}) => {
 
   const onEditPress = () => {};
 
-  const onDeletePress = () => {};
+  const onDeletePress = async () => {
+    console.log(selectedProduct);
 
-  const onAddPress = () => {};
+    Alert.alert(
+      'Confirm Delete',
+      'Are you sure you want to delete this product?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: async () => {
+            try {
+              await deleteProduct(selectedProduct);
+            } catch (error) {
+              console.error('Failed to delete product: ', error);
+              Alert.alert('Error', 'Failed to delete product');
+            }
+          },
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
+  const deleteProduct = async itemName => {
+    // Query the collection to find the document id of the product with itemName
+
+    const snapshot = await firestore()
+      .collection('products')
+      .where('ItemName', '==', itemName)
+      .get();
+
+    if (snapshot.empty) {
+      Alert.alert('Error', 'No matching product found.');
+      return;
+    }
+
+    // Get the document id of the matching product
+    const docId = snapshot.docs[0].id;
+
+    // Delete the document from Firestore
+    firestore()
+      .collection('products')
+      .doc(docId)
+      .delete()
+      .then(() => {
+        // Remove the product from the state
+        setProducts(productList => {
+          const index = productList.findIndex(
+            product => product.ItemName === itemName,
+          );
+          if (index !== -1) {
+            productList.splice(index, 1);
+            return [...productList];
+          }
+          return productList;
+        });
+        setSelectedProduct(null);
+        Alert.alert(
+          'Product Deleted',
+          'The product has been successfully deleted.',
+        );
+      })
+      .catch(error => {
+        Alert.alert(
+          'Error',
+          'Something went wrong while deleting the product. Please try again later.',
+        );
+      });
+  };
+
+  const onAddPress = () => {
+    navigation.navigate('New Product');
+  };
 
   return (
     <View style={styles.container}>
