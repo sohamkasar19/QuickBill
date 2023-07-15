@@ -12,6 +12,7 @@ import {generateHTML} from '../util/GenerateHTML';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {generateOrderId} from '../util/GenerateOrderId';
+import RNFS from 'react-native-fs';
 
 const OrderReviewScreen = ({route, navigation}) => {
   const {order} = route.params;
@@ -53,14 +54,35 @@ const OrderReviewScreen = ({route, navigation}) => {
 
       const currentDate = new Date();
       const dateStr = currentDate.toISOString().replace(/[:.]/g, '-');
+      const FileName = `order_${order.dealer.DealerName}_${dateStr}`;
 
       const options = {
         html,
-        fileName: `order_${order.dealer.DealerName}_${dateStr}`,
+        fileName: FileName,
         directory: 'Orders',
       };
       const pdf = await RNHTMLtoPDF.convert(options);
-      Alert.alert('Success', `PDF saved to ${pdf.filePath}`, [
+      const destinationPath = RNFS.DownloadDirectoryPath;
+
+      const destinationFile = destinationPath + '/' + FileName + '.pdf';
+      RNFS.copyFile(pdf.filePath, destinationFile)
+        .then(result => {
+          // Delete a file on the project path using RNFS.unlink
+          return (
+            RNFS.unlink(pdf.filePath)
+              .then(() => {
+                console.log('FILE DELETED');
+              })
+              // `unlink` will throw an error, if the item to unlink does not exist
+              .catch(err => {
+                console.log(err.message);
+              })
+          );
+        })
+        .catch(err => {
+          console.log('err', err);
+        });
+      Alert.alert('Success', `PDF saved to ${destinationFile}`, [
         {
           text: 'OK',
           onPress: () => {
