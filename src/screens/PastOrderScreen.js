@@ -1,5 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, ScrollView, ActivityIndicator} from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import OrderItem from '../components/OrderItem';
@@ -28,8 +34,10 @@ function PastOrdersScreen({navigation}) {
         .where('created_by', '==', user.uid)
         .orderBy('created_at', 'desc')
         .get();
-      const ordersData = querySnapshot.docs.map(doc => doc.data());
-      setOrders(ordersData);
+      if (querySnapshot) {
+        const ordersData = querySnapshot.docs.map(doc => doc.data());
+        setOrders(ordersData);
+      }
     }
     setLoading(false);
   };
@@ -46,19 +54,45 @@ function PastOrdersScreen({navigation}) {
 
   if (loading) {
     return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
     );
   }
 
   return (
-    <ScrollView>
-      {orders.map(order => (
-        <OrderItem key={order.orderId} order={order} />
-      ))}
+    <ScrollView contentContainerStyle={styles.container}>
+      {orders.length > 0 ? (
+        orders.map(order => <OrderItem key={order.orderId} order={order} />)
+      ) : (
+        <View style={styles.messageContainer}>
+          <Text style={styles.messageText}>No past orders found.</Text>
+        </View>
+      )}
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  messageContainer: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: '40%',
+  },
+  messageText: {
+    fontSize: 25,
+    color: '#333',
+    textAlign: 'center',
+  },
+});
 
 export default PastOrdersScreen;
