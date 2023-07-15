@@ -44,6 +44,7 @@ const ProductsScreen = ({navigation}) => {
     const selectedProductObj = products.find(
       prod => prod.ItemName === selectedProduct,
     );
+    setSelectedProduct(null);
     navigation.navigate('Edit Product', {product: selectedProductObj});
   };
 

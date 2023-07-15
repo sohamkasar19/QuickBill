@@ -80,7 +80,7 @@ const EditProductScreen = ({route, navigation}) => {
       } catch (error) {
         Alert.alert(
           'Error',
-          'Something went wrong while adding the new product. Please try again later.',
+          'Something went wrong while editing the new product. Please try again later.',
         );
       }
     }
