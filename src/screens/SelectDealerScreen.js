@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 const SelectDealerScreen = ({navigation}) => {
   const [dealers, setDealers] = useState([]);
@@ -40,10 +41,25 @@ const SelectDealerScreen = ({navigation}) => {
           ...doc.data(),
         });
       });
-      setDealers(dealersData);
+
+      const user = await getRole();
+      if (user.role === 'admin') {
+        setDealers(dealersData);
+      } else {
+        const filteredDealers = dealersData.filter(dealer => {
+          return dealer.Employee.toLowerCase() === user.name.toLowerCase();
+        });
+        setDealers(filteredDealers);
+      }
     };
     getDealers();
   }, []);
+
+  const getRole = async () => {
+    const user = auth().currentUser;
+    const userDoc = await firestore().collection('users').doc(user.uid).get();
+    return userDoc.data();
+  };
 
   return (
     <View style={styles.container}>
