@@ -147,6 +147,9 @@ const EditProductScreen = ({route, navigation}) => {
         // dropDownStyle={{backgroundColor: '#fafafa'}}
         onChangeItem={item => setUom(item.value)}
         setValue={setUom}
+        searchTextInputProps={{
+          autoFocus: true,
+        }}
       />
 
       <Text style={styles.label}>Unit</Text>

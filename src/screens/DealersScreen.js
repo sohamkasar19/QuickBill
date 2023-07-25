@@ -145,6 +145,9 @@ const DealersScreen = ({navigation}) => {
         searchable={true}
         placeholder="Select a Dealer"
         loading={loading}
+        searchTextInputProps={{
+          autoFocus: true,
+        }}
       />
       {selectedDealer ? (
         <View style={styles.buttonContainer}>

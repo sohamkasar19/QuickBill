@@ -146,6 +146,9 @@ const ProductsScreen = ({navigation}) => {
         searchable={true}
         placeholder="Select a Product"
         loading={loading}
+        searchTextInputProps={{
+          autoFocus: true,
+        }}
       />
       {selectedProduct ? (
         <View style={styles.buttonContainer}>

@@ -78,6 +78,9 @@ const SelectDealerScreen = ({navigation}) => {
         searchable={true}
         placeholder="Select a Dealer"
         loading={loading}
+        searchTextInputProps={{
+          autoFocus: true,
+        }}
       />
       <TouchableOpacity style={styles.button} onPress={onSubmit}>
         <Text style={styles.buttonText}>Next</Text>

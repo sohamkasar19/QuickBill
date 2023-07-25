@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  KeyboardAvoidingView,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import firestore from '@react-native-firebase/firestore';
@@ -28,6 +29,7 @@ const AddProductsScreen = ({route, navigation}) => {
   const [freeItems, setFreeItems] = useState(false);
   const [freeSample, setFreeSample] = useState(false);
   const [dealerData, setDealerData] = useState(null);
+  const quantityInputRef = useRef(null);
 
   useEffect(() => {
     if (route.params.dealer) {
@@ -214,13 +216,22 @@ const AddProductsScreen = ({route, navigation}) => {
           value: 'ItemName',
         }}
         setOpen={setOpen}
-        setValue={setSelectedProduct}
+        setValue={itemValue => {
+          setSelectedProduct(itemValue);
+          setTimeout(() => {
+            quantityInputRef.current.focus();
+          }, 100);
+        }}
         setItems={setProducts}
         searchable={true}
         placeholder="Select a Product"
         loading={loading}
+        searchTextInputProps={{
+          autoFocus: true,
+        }}
       />
       <TextInput
+        ref={quantityInputRef}
         style={styles.input}
         placeholder="Enter Quantity Kg/L"
         onChangeText={onChangeQuantity}
