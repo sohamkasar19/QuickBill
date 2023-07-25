@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
+import CheckBox from '@react-native-community/checkbox';
 import DropDownPicker from 'react-native-dropdown-picker';
 import firestore from '@react-native-firebase/firestore';
 
@@ -18,10 +19,13 @@ const EditProductScreen = ({route, navigation}) => {
   const [uom, setUom] = useState(product.UOM);
   const [unit, setUnit] = useState(product.Unit.toString());
   const [gst, setGst] = useState(product.GST ? product.GST.toString() : '0');
+  const [mrpIncludesGst, setMrpIncludesGst] = useState(
+    product.mrpIncludesGst || false,
+  );
 
   const [open, setOpen] = useState(false);
 
-  console.log(product);
+  // console.log(product);
 
   const handleSubmit = async () => {
     if (itemName === '' || mrp === '' || uom === '' || unit === '') {
@@ -39,12 +43,18 @@ const EditProductScreen = ({route, navigation}) => {
         }
       }
 
+      if (mrpIncludesGst && (gst === '' || gst === '0')) {
+        Alert.alert('Error', 'Please enter GST value when MRP includes GST');
+        return;
+      }
+
       const newProduct = {
         ItemName: itemName,
         MRP: parseFloat(mrp),
         UOM: uom,
         Unit: parseFloat(unit),
         GST: parseFloat(gst ? gst : 0),
+        mrpIncludesGst,
       };
 
       const productId = await getProductIdByName(product.ItemName);
@@ -98,25 +108,6 @@ const EditProductScreen = ({route, navigation}) => {
     }
 
     return productId;
-  };
-
-  const updateProductDetails = async (originalProductName, newProductData) => {
-    // Get the product ID by product name
-    const productId = await getProductIdByName(originalProductName);
-
-    if (!productId) {
-      console.log(`Product: ${originalProductName} not found.`);
-      return;
-    }
-
-    // Define a reference to the document you want to update
-    const productRef = firestore().collection('products').doc(productId);
-
-    // Use the update method on the document reference to update the document
-    await productRef
-      .update(newProductData)
-      .then(() => console.log('Product updated successfully.'))
-      .catch(error => console.log(`Error updating product: ${error}`));
   };
 
   return (
@@ -176,6 +167,11 @@ const EditProductScreen = ({route, navigation}) => {
         keyboardType="numeric"
       />
 
+      <View style={styles.checkboxContainer}>
+        <CheckBox value={mrpIncludesGst} onValueChange={setMrpIncludesGst} />
+        <Text style={styles.checkboxLabel}>MRP includes GST</Text>
+      </View>
+
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
@@ -211,6 +207,15 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     color: 'white',
+    fontSize: 18,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  checkboxLabel: {
+    marginLeft: 8,
     fontSize: 18,
   },
 });

@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
+import CheckBox from '@react-native-community/checkbox';
 import DropDownPicker from 'react-native-dropdown-picker';
 import firestore from '@react-native-firebase/firestore';
 
@@ -16,6 +17,7 @@ const NewProductScreen = ({navigation}) => {
   const [uom, setUom] = useState('');
   const [unit, setUnit] = useState('');
   const [gst, setGst] = useState('');
+  const [mrpIncludesGst, setMrpIncludesGst] = useState(false);
 
   const [open, setOpen] = useState(false);
 
@@ -32,6 +34,10 @@ const NewProductScreen = ({navigation}) => {
         Alert.alert('Error', 'A product with this name already exists.');
         return;
       }
+      if (mrpIncludesGst && (gst === '' || gst === '0')) {
+        Alert.alert('Error', 'Please enter GST value when MRP includes GST');
+        return;
+      }
 
       const newProduct = {
         ItemName: itemName,
@@ -39,6 +45,7 @@ const NewProductScreen = ({navigation}) => {
         UOM: uom,
         Unit: parseFloat(unit),
         GST: parseFloat(gst ? gst : 0),
+        mrpIncludesGst,
       };
 
       // Add the new product to the Firestore database
@@ -128,6 +135,11 @@ const NewProductScreen = ({navigation}) => {
         keyboardType="numeric"
       />
 
+      <View style={styles.checkboxContainer}>
+        <CheckBox value={mrpIncludesGst} onValueChange={setMrpIncludesGst} />
+        <Text style={styles.checkboxLabel}>MRP includes GST</Text>
+      </View>
+
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
@@ -163,6 +175,15 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     color: 'white',
+    fontSize: 18,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  checkboxLabel: {
+    marginLeft: 8,
     fontSize: 18,
   },
 });

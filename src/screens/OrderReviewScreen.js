@@ -8,11 +8,12 @@ import {
 } from 'react-native';
 import {Table, Row, TableWrapper, Cell} from 'react-native-table-component';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import {generateHTML} from '../util/GenerateHTML';
+import {generateHTMLWhenMRPWithoutGST} from '../util/GenerateHTMLWhenMRPWithoutGST';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import {generateOrderId} from '../util/GenerateOrderId';
 import RNFS from 'react-native-fs';
+import {generateHTMLWhenMRPWithGST} from '../util/GenerateHTMLWhenMRPWithGST';
 
 const OrderReviewScreen = ({route, navigation}) => {
   const {order} = route.params;
@@ -20,13 +21,6 @@ const OrderReviewScreen = ({route, navigation}) => {
   const submitOrder = async () => {
     try {
       const orderId = order.orderId ? order.orderId : generateOrderId();
-      // await firestore().collection('orders').add({
-      //   orderId: orderId,
-      //   dealer: order.dealer,
-      //   products: order.productList,
-      //   created_by: auth().currentUser.uid,
-      //   created_at: firestore.FieldValue.serverTimestamp(),
-      // });
 
       const orderRef = firestore().collection('orders').doc(orderId);
 
@@ -41,20 +35,77 @@ const OrderReviewScreen = ({route, navigation}) => {
         {merge: true},
       );
 
-      createPDF(orderId);
+      // createPDF(orderId);
+      const [productsWithGST, productsWithoutGST] = splitProducts(
+        order.productList,
+      );
+      let destination1 = 'NA',
+        destination2 = 'NA';
+      if (productsWithGST.length > 0) {
+        destination1 = await createPDF(orderId, productsWithGST, 'WithGST');
+      }
+      if (productsWithoutGST.length > 0) {
+        destination2 = await createPDF(
+          orderId,
+          productsWithoutGST,
+          'WithoutGST',
+        );
+      }
+
+      Alert.alert(
+        'Success',
+        `PDF saved to \n${destination1 === 'NA' ? '' : destination1} \n${
+          destination2 === 'NA' ? '' : destination2
+        }`,
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              navigation.navigate('Home');
+            },
+          },
+        ],
+      );
     } catch (error) {
       console.error('Failed to save order with error: ', error);
       Alert.alert('Error', 'Failed to save order');
     }
   };
 
-  const createPDF = async orderId => {
+  const splitProducts = products => {
+    const productsWithGST = [];
+    const productsWithoutGST = [];
+
+    for (let product of products) {
+      if (product.product.mrpIncludesGst) {
+        productsWithGST.push(product);
+      } else {
+        productsWithoutGST.push(product);
+      }
+    }
+
+    return [productsWithGST, productsWithoutGST];
+  };
+
+  const createPDF = async (orderId, products, gstFlag) => {
     try {
-      const html = generateHTML(orderId, order);
+      let html = '';
+      if (gstFlag === 'WithoutGST') {
+        html = await generateHTMLWhenMRPWithoutGST(orderId, {
+          ...order,
+          productList: products,
+        });
+      }
+      if (gstFlag === 'WithGST') {
+        html = await generateHTMLWhenMRPWithGST(orderId, {
+          ...order,
+          productList: products,
+        });
+      }
 
       const currentDate = new Date();
       const dateStr = currentDate.toISOString().replace(/[:.]/g, '-');
-      const FileName = `order_${order.dealer.DealerName}_${dateStr}`;
+      const FileName = `order_${order.dealer.DealerName}_${dateStr}_${gstFlag}`;
 
       const options = {
         html,
@@ -82,17 +133,17 @@ const OrderReviewScreen = ({route, navigation}) => {
         .catch(err => {
           console.log('err', err);
         });
-      Alert.alert('Success', `PDF saved to ${destinationFile}`, [
-        {
-          text: 'OK',
-          onPress: () => {
-            navigation.navigate('Home');
-          },
-        },
-      ]);
-
-      // pdf.filePath is the path to the PDF
+      // Alert.alert('Success', `PDF saved to ${destinationFile}`, [
+      //   {
+      //     text: 'OK',
+      //     onPress: () => {
+      //       navigation.navigate('Home');
+      //     },
+      //   },
+      // ]);
       console.log(pdf.filePath);
+
+      return destinationFile;
     } catch (error) {
       console.error(error);
     }
@@ -115,12 +166,7 @@ const OrderReviewScreen = ({route, navigation}) => {
             {order.productList.map((productData, index) => {
               const mrp = productData.product ? productData.product.MRP : 'N/A';
               return (
-                <TableWrapper
-                  key={index}
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
+                <TableWrapper key={index} style={styles.tableWrapper}>
                   <Cell
                     flex={2.5}
                     data={productData.product.ItemName}
@@ -177,6 +223,10 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 15,
+  },
+  tableWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });
 

@@ -1,4 +1,4 @@
-export const generateHTML = (orderId, order) => {
+export const generateHTMLWhenMRPWithoutGST = (orderId, order) => {
   let dealerDetails = order.dealer;
   let productList = order.productList;
 
@@ -20,8 +20,6 @@ export const generateHTML = (orderId, order) => {
     <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
       <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <title>SALES ORDER - DATAIL - 1</title>
-        <meta name="author" content="Soham Kasar" />
         <style type="text/css">
           * {
             margin: 0;
