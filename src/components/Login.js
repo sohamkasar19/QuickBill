@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {
   View,
   Text,
-  Button,
   TextInput,
   StyleSheet,
   TouchableOpacity,
@@ -10,10 +9,13 @@ import {
 } from 'react-native';
 // import {auth} from '../../firebase';
 import auth from '@react-native-firebase/auth';
+import Dialog from 'react-native-dialog';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isDialogVisible, setDialogVisible] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
 
   const onLogin = () => {
     // Check for empty fields
@@ -48,6 +50,26 @@ const Login = ({navigation}) => {
       });
   };
 
+  const onForgotPassword = () => {
+    setDialogVisible(true);
+  };
+
+  const onSubmitEmail = () => {
+    auth()
+      .sendPasswordResetEmail(resetEmail)
+      .then(() => {
+        setDialogVisible(false);
+        Alert.alert(
+          'Success',
+          'Password reset link has been sent to your email.',
+        );
+      })
+      .catch(error => {
+        console.error(error);
+        Alert.alert('Error', error.message);
+      });
+  };
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -68,6 +90,24 @@ const Login = ({navigation}) => {
       <TouchableOpacity onPress={() => navigation.navigate('Register')}>
         <Text style={styles.linkText}>First time user? Register</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity onPress={onForgotPassword}>
+        <Text style={styles.linkText}>Forgot Password?</Text>
+      </TouchableOpacity>
+
+      <Dialog.Container visible={isDialogVisible}>
+        <Dialog.Title>Password Reset</Dialog.Title>
+        <Dialog.Description>
+          Enter your email to receive a password reset link.
+        </Dialog.Description>
+        <Dialog.Input
+          placeholder="Email"
+          onChangeText={text => setResetEmail(text)}
+          value={resetEmail}
+        />
+        <Dialog.Button label="Cancel" onPress={() => setDialogVisible(false)} />
+        <Dialog.Button label="Submit" onPress={onSubmitEmail} />
+      </Dialog.Container>
     </View>
   );
 };
@@ -105,6 +145,28 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 18,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });
 
