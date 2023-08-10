@@ -734,7 +734,7 @@ export const generateHTMLWhenMRPWithGST = (orderId, order) => {
     productData.quantity = parseFloat(productData.quantity, 10).toFixed(2);
     const netRate = parseFloat(
       currProduct.MRP *
-        (1 - (currProduct.GST ? currProduct.GST / 100 : 0.18)) *
+        (100 / (100 + currProduct.GST)) *
         (1 - (dealerDetails.Discount ? dealerDetails.Discount / 100 : 0)) *
         (1 -
           (dealerDetails.CashDiscount ? dealerDetails.CashDiscount / 100 : 0)),
@@ -745,7 +745,10 @@ export const generateHTMLWhenMRPWithGST = (orderId, order) => {
       taxableAmount * ((currProduct.GST ? currProduct.GST : 0) / 100),
       10,
     ).toFixed(2);
-    const totalAmount = parseFloat(taxableAmount + gstAmount, 10).toFixed(2);
+    const totalAmount = parseFloat(
+      parseFloat(taxableAmount) + parseFloat(gstAmount),
+      10,
+    ).toFixed(2);
     totalQty += Number(productData.quantity);
 
     totalGrossAmount += Number(grossAmount);
@@ -1367,7 +1370,7 @@ export const generateHTMLWhenMRPWithGST = (orderId, order) => {
             class="s3"
             style="text-indent: 0pt; line-height: 9pt; text-align: center"
           >
-            TOTAL
+            TOTAL R/O
           </p>
         </td>
         <td
@@ -1392,7 +1395,7 @@ export const generateHTMLWhenMRPWithGST = (orderId, order) => {
               text-align: right;
             "
           >
-            ${totalTotalAmount.toFixed(2)}
+            ${Math.round(totalTotalAmount).toFixed(2)}
           </p>
         </td>
       </tr>
