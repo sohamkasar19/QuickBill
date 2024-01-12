@@ -1,3 +1,5 @@
+import {imageBase64} from './company_logo.js';
+
 export const generateHTMLWhenMRPWithGST = (orderId, order) => {
   let dealerDetails = order.dealer;
   let productList = order.productList;
@@ -15,713 +17,281 @@ export const generateHTMLWhenMRPWithGST = (orderId, order) => {
 
   const formattedToday = dd + '/' + mm + '/' + yyyy;
 
-  let html = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-  <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  let html = `<!DOCTYPE html>
+  <html>
     <head>
       <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-      <style type="text/css">
-        * {
-          margin: 0;
-          padding: 0;
-          text-indent: 0;
-        }
-        .s1 {
-          color: black;
-          font-family: Arial, sans-serif;
-          font-style: normal;
-          font-weight: bold;
-          text-decoration: none;
-          font-size: 14.5pt;
-        }
-        .s2 {
-          color: black;
-          font-family: Arial, sans-serif;
-          font-style: normal;
-          font-weight: bold;
-          text-decoration: none;
-          font-size: 11pt;
-        }
-        .s3 {
-          color: black;
-          font-family: Arial, sans-serif;
-          font-style: normal;
-          font-weight: normal;
-          text-decoration: none;
-          font-size: 9pt;
-        }
-        .s4 {
-          color: black;
-          font-family: Arial, sans-serif;
-          font-style: normal;
-          font-weight: bold;
-          text-decoration: none;
-          font-size: 9pt;
-        }
-        .s5 {
-          color: black;
-          font-family: Arial, sans-serif;
-          font-style: normal;
-          font-weight: normal;
-          text-decoration: none;
-          font-size: 9.5pt;
-        }
-        table,
-        tbody {
-          vertical-align: top;
-          overflow: visible;
-        }
+      <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+      }
+      
+      .table {
+        width: 511pt;
+        border-collapse: collapse;
+        margin-left: 5.775pt;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 25pt; 
+      }
+      
+      .s1 {
+        color: black;
+        font-family: Arial, sans-serif;
+        font-style: normal;
+        font-weight: bold;
+        text-decoration: none;
+        font-size: 8pt;
+        margin: 0.3em;
+      }
+      
+      .s2 {
+        color: black;
+        font-family: Arial, sans-serif;
+        font-style: normal;
+        font-weight: normal;
+        text-decoration: none;
+        font-size: 8pt;
+        margin: 0.3em;
+      }
+      
+      th,
+      td {
+        border: 1pt solid black;
+        padding: 4px;
+        text-align: left;
+      }
+      
+      .header {
+        /* padding-left: 30pt;
+        padding-right: 30pt; */
+        /* text-indent: 0pt; */
+        /* line-height: 9pt; */
+        text-align: center;
+      }
+      
+      .sub-header {
+        padding-left: 1pt;
+        /* padding-right: 384pt; */
+        text-indent: 0pt;
+        /* line-height: 11pt; */
+        text-align: center;
+      }
+      
+      .header-row {
+        text-align: center;
+      }
+      
+      .logo-container {
+        float: left;
+        width: 110pt;
+      }
+      
+      .logo {
+        width: 100%;
+        height: auto;
+      }
+      
+      .company-info {
+        display: inline-block;
+        vertical-align: middle;
+      
+        margin-right: 110pt;
+      }
+      
+      /* Clear the float */
+      /* .header-row::after {
+        content: '';
+        display: table;
+        clear: both;
+      } */
+      
+      .info-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 1px;
+      }
+      
+      /* .left-info,
+      .right-info {
+        flex-basis: 70;
+      } */
+      
+      .right-info {
+        text-align: right;
+      }
+      
+      .text-left {
+        text-align: left;
+      }
+      
+      .text-right {
+        text-align: right;
+      }
+      
+      .text-center {
+        text-align: center;
+      }
+      
+      .bold {
+        font-weight: bold;
+      }
+      
+      .small-text {
+        font-size: 8pt;
+        /* margin: 0; */
+      }
+      .no-margin {
+        margin: 0;
+      }
+      .no-bottom-top-margin {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+      
+      .no-padding {
+        padding: 1px;
+      }
+      
+      .col-particular {
+        width: 137pt;
+      }
+      
+      .col-unit {
+        width: 30pt;
+      }
+      
+      .col-mrp {
+        width: 24pt;
+      }
+      
+      .col-qty {
+        width: 38pt;
+      }
+      
+      .col-units {
+        width: 25pt;
+      }
+      
+      .col-gross {
+        width: 47pt;
+      }
+      
+      .col-net-rate {
+        width: 46pt;
+      }
+      
+      .col-disc-amt {
+        width: 42pt;
+      }
+      
+      .col-taxable {
+        width: 48pt;
+      }
+      
+      .col-gst {
+        width: 34pt;
+      }
+      
+      .col-total-amount {
+        width: 59pt;
+      }
+      
+      .signature {
+        padding-left: 300pt;
+        padding-right: 10pt;
+        text-indent: 0pt;
+        line-height: 9pt;
+        text-align: center;
+      }
+      
+      .no-bottom-border {
+        border-bottom: none;
+      }
+      .no-border {
+        border: none;
+      }
+      
+      .no-top-border {
+        border-top: none;
+      }
+      
+      .no-left-border {
+        border-left: none;
+      }
+      .no-right-border {
+        border-right: none;
+      }
       </style>
     </head>
     <body>
-      <p style="text-indent: 0pt; text-align: left"><br /></p>
-      <table
-        style="border-collapse: collapse; margin-left: 5.91pt"
-        cellspacing="0"
-      >
-        <tr style="height: 17pt">
-          <td
-            style="
-              width: 511pt;
-              border-top-style: solid;
-              border-top-width: 1pt;
-              border-left-style: solid;
-              border-left-width: 1pt;
-              border-bottom-style: solid;
-              border-bottom-width: 1pt;
-              border-right-style: solid;
-              border-right-width: 1pt;
-            "
-            colspan="10"
-          >
-            <p
-              class="s1"
-              style="
-                padding-left: 209pt;
-                padding-right: 208pt;
-                text-indent: 0pt;
-                line-height: 16pt;
-                text-align: center;
-              "
-            >
-              SALES ORDER
-            </p>
-          </td>
-        </tr>
-        <tr style="height: 65pt">
-          <td
-            style="
-              width: 511pt;
-              border-top-style: solid;
-              border-top-width: 1pt;
-              border-left-style: solid;
-              border-left-width: 1pt;
-              border-bottom-style: solid;
-              border-bottom-width: 1pt;
-              border-right-style: solid;
-              border-right-width: 1pt;
-            "
-            colspan="10"
-          >
-            <p
-              class="s2"
-              style="
-                padding-top: 4pt;
-                padding-left: 1pt;
-                text-indent: 0pt;
-                text-align: left;
-              "
-            >
-              SANZYME BIOLOGICS PRIVATE LIMITED
-            </p>
-            <p
-              class="s3"
-              style="
-                padding-top: 2pt;
-                padding-left: 1pt;
-                padding-right: 397pt;
-                text-indent: 0pt;
-                line-height: 112%;
-                text-align: left;
-              "
-            >
-              Plot No. 13, Sagar Society, Road No. 2, Banjara Hills, Hyderabad -
-              500 034
-            </p>
-          </td>
-        </tr>
-        <tr style="height: 33pt">
-          <td
-            style="
-              width: 137pt;
-              border-top-style: solid;
-              border-top-width: 1pt;
-              border-left-style: solid;
-              border-left-width: 1pt;
-              border-bottom-style: solid;
-              border-bottom-width: 1pt;
-            "
-          >
-            <p
-              class="s4"
-              style="
-                padding-left: 1pt;
-                text-indent: 0pt;
-                line-height: 10pt;
-                text-align: left;
-              "
-            >
-              Order No. : ${orderId}
-            </p>
-            <p style="text-indent: 0pt; text-align: left"><br /></p>
-            <p
-              class="s4"
-              style="
-                padding-left: 1pt;
-                text-indent: 0pt;
-                line-height: 10pt;
-                text-align: left;
-              "
-            >
-              Field Staff : ${dealerDetails.Employee}
-            </p>
-          </td>
-          <td
-            style="
-              width: 30pt;
-              border-top-style: solid;
-              border-top-width: 1pt;
-              border-bottom-style: solid;
-              border-bottom-width: 1pt;
-            "
-          >
-            <p style="text-indent: 0pt; text-align: left"><br /></p>
-          </td>
-          <td
-            style="
-              width: 24pt;
-              border-top-style: solid;
-              border-top-width: 1pt;
-              border-bottom-style: solid;
-              border-bottom-width: 1pt;
-            "
-          >
-            <p style="text-indent: 0pt; text-align: left"><br /></p>
-          </td>
-          <td
-            style="
-              width: 30pt;
-              border-top-style: solid;
-              border-top-width: 1pt;
-              border-bottom-style: solid;
-              border-bottom-width: 1pt;
-            "
-          >
-            <p style="text-indent: 0pt; text-align: left"><br /></p>
-          </td>
-          <td
-            style="
-              width: 38pt;
-              border-top-style: solid;
-              border-top-width: 1pt;
-              border-bottom-style: solid;
-              border-bottom-width: 1pt;
-            "
-          >
-            <p style="text-indent: 0pt; text-align: left"><br /></p>
-          </td>
-          <td
-            style="
-              width: 47pt;
-              border-top-style: solid;
-              border-top-width: 1pt;
-              border-bottom-style: solid;
-              border-bottom-width: 1pt;
-            "
-          >
-            <p style="text-indent: 0pt; text-align: left"><br /></p>
-          </td>
-          <td
-            style="
-              width: 46pt;
-              border-top-style: solid;
-              border-top-width: 1pt;
-              border-bottom-style: solid;
-              border-bottom-width: 1pt;
-            "
-          >
-            <p style="text-indent: 0pt; text-align: left"><br /></p>
-          </td>
-          <td
-            style="
-              width: 48pt;
-              border-top-style: solid;
-              border-top-width: 1pt;
-              border-bottom-style: solid;
-              border-bottom-width: 1pt;
-            "
-          >
-            <p
-              class="s4"
-              style="
-                padding-left: 13pt;
-                text-indent: 0pt;
-                line-height: 10pt;
-                text-align: left;
-              "
-            >
-              Date :
-            </p>
-          </td>
-          <td
-            style="
-              width: 111pt;
-              border-top-style: solid;
-              border-top-width: 1pt;
-              border-bottom-style: solid;
-              border-bottom-width: 1pt;
-              border-right-style: solid;
-              border-right-width: 1pt;
-            "
-            colspan="2"
-          >
-            <p
-              class="s3"
-              style="
-                padding-left: 3pt;
-                text-indent: 0pt;
-                line-height: 10pt;
-                text-align: left;
-              "
-            >
-            ${formattedToday}
-            </p>
-          </td>
-        </tr>
-        <tr style="height: 11pt">
-          <td
-            style="
-              width: 511pt;
-              border-top-style: solid;
-              border-top-width: 1pt;
-              border-left-style: solid;
-              border-left-width: 1pt;
-              border-bottom-style: solid;
-              border-bottom-width: 1pt;
-              border-right-style: solid;
-              border-right-width: 1pt;
-            "
-            colspan="10"
-          >
-            <p
-              class="s4"
-              style="
-                padding-left: 1pt;
-                text-indent: 0pt;
-                line-height: 9pt;
-                text-align: left;
-              "
-            >
-              ORDER FROM :
-            </p>
-          </td>
-        </tr>
-        <tr style="height: 57pt">
-          <td
-            style="
-              width: 511pt;
-              border-top-style: solid;
-              border-top-width: 1pt;
-              border-left-style: solid;
-              border-left-width: 1pt;
-              border-bottom-style: solid;
-              border-bottom-width: 1pt;
-              border-right-style: solid;
-              border-right-width: 1pt;
-            "
-            colspan="10"
-          >
-            <p
-              class="s4"
-              style="
-                padding-left: 1pt;
-                text-indent: 0pt;
-                line-height: 10pt;
-                text-align: left;
-              "
-            >
-            ${dealerDetails.DealerName}
-            </p>
-            <p
-              class="s5"
-              style="
-                padding-top: 1pt;
-                padding-left: 1pt;
-                text-indent: 0pt;
-                text-align: left;
-              "
-            >
+    <table class="table">
+      <tr>
+        <td colspan="10" class="s1 header">SALES ORDER</td>
+      </tr>
+      <tr>
+        <td colspan="10" class="header-row">
+          <div class="logo-container">
+            <img src="${imageBase64}" alt="Company Logo" class="logo" />
+          </div>
+          <div class="company-info">
+            <p class="s1 sub-header">SANZYME BIOLOGICS PRIVATE LIMITED</p>
+            <p class="s2 sub-header">Plot No. 13, Sagar Society,</p>
+            <p class="s2 sub-header">Road No. 2, Banjara Hills,</p>
+            <p class="s2 sub-header">Hyderabad - 500 034</p>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="10">
+          <div class="info-container">
+            <div class="left-info">
+              <p class="s1 small-text">Order No. : ${orderId}</p>
+
+              <p class="s1 small-text">
+                Field Staff : ${dealerDetails.Employee}
+              </p>
+            </div>
+            <div class="right-info">
+              <p class="s2 small-text">Date: ${formattedToday}</p>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="10" class="text-left">
+          <p class="s1 small-text ">ORDER FROM :</p>
+          <p class="s1 small-text no-bottom-top-margin">${
+            dealerDetails.DealerName
+          }</p>
+          <p class="s2 small-text no-bottom-top-margin">
             ${dealerDetails.Address1 ? dealerDetails.Address1 : ''}
-            </p>
-            <p
-              class="s3"
-              style="
-                padding-left: 1pt;
-                padding-right: 338pt;
-                text-indent: 0pt;
-                line-height: 110%;
-                text-align: left;
-              "
-            >
+          </p>
+          <p class="s2 small-text no-bottom-top-margin">
             ${dealerDetails.Address2 ? dealerDetails.Address2 : ''}
-            </p>
-            <p
-              class="s3"
-              style="
-                padding-left: 1pt;
-                padding-right: 338pt;
-                text-indent: 0pt;
-                line-height: 110%;
-                text-align: left;
-              "
-            >
+          </p>
+          <p class="s2 small-text no-bottom-top-margin">
             ${dealerDetails.Address3 ? dealerDetails.Address3 : ''}
-            </p>
-          </td>
-        </tr>
-        <tr style="height: 22pt">
-        <td
-          style="
-            width: 137pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-left: 1pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: left;
-            "
-          >
-            Particulat
-          </p>
-        </td>
-        <td
-          style="
-            width: 30pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-left: 6pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: left;
-            "
-          >
-            Unit
-          </p>
-        </td>
-        <td
-          style="
-            width: 24pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="text-indent: 0pt; line-height: 10pt; text-align: center"
-          >
-            MRP
-          </p>
-        </td>
-        <td
-          style="
-            width: 30pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-left: 4pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: left;
-            "
-          >
-            No.of
-          </p>
-          <p
-            class="s3"
-            style="
-              padding-top: 1pt;
-              padding-left: 5pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: left;
-            "
-          >
-            Units
-          </p>
-        </td>
-        <td
-          style="
-            width: 38pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-left: 3pt;
-              padding-right: 2pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: center;
-            "
-          >
-            Qty
-          </p>
-          <p
-            class="s3"
-            style="
-              padding-top: 1pt;
-              padding-left: 3pt;
-              padding-right: 2pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: center;
-            "
-          >
-            Kgs/Lts
-          </p>
-        </td>
-        <td
-          style="
-            width: 47pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-left: 13pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: left;
-            "
-          >
-            Gross
-          </p>
-          <p
-            class="s3"
-            style="
-              padding-top: 1pt;
-              padding-left: 8pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: left;
-            "
-          >
-            Amount
-          </p>
-        </td>
-        <td
-          style="
-            width: 46pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-left: 12pt;
-              padding-right: 12pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: center;
-            "
-          >
-            Net
-          </p>
-          <p
-            class="s3"
-            style="
-              padding-top: 1pt;
-              padding-left: 12pt;
-              padding-right: 12pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: center;
-            "
-          >
-            Rate
-          </p>
-        </td>
-        <td
-          style="
-            width: 48pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-left: 9pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: left;
-            "
-          >
-            Taxable
-          </p>
-          <p
-            class="s3"
-            style="
-              padding-top: 1pt;
-              padding-left: 13pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: left;
-            "
-          >
-            Value
-          </p>
-        </td>
-        <td
-          style="
-            width: 52pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-left: 1pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: center;
-            "
-          >
-            GST
-          </p>
-          <p
-            class="s3"
-            style="
-              padding-top: 1pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: center;
-            "
-          >
-            Amount
-          </p>
-        </td>
-        <td
-          style="
-            width: 59pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-left: 13pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: left;
-            "
-          >
-            Amount
-          </p>
-          <p
-            class="s3"
-            style="
-              padding-top: 1pt;
-              padding-left: 18pt;
-              text-indent: 0pt;
-              line-height: 10pt;
-              text-align: left;
-            "
-          >
-            Value
           </p>
         </td>
       </tr>
+      <tr>
+        <td class="text-left small-text col-particular bold">Particulat</td>
+        <td class="text-left small-text col-unit bold">Unit</td> 
+        <td class="text-left small-text col-mrp bold">MRP</td>
+        <td class="text-left small-text col-units bold">No. of Units</td> 
+        <td class="text-left small-text col-qty bold">Qty Kg/Ltr</td> 
+        <td class="text-left small-text col-gross bold">Gross Amount</td>
+        <td class="text-left small-text col-net-rate bold">Net Rate</td> 
+        <td class="text-left small-text col-taxable bold">Taxable Value</td> 
+        <td class="text-left small-text col-gst bold">GST Amount</td>
+        <td class="text-left small-text col-total-amount bold">Total Amount</td>
+      </tr>
+      
      `;
   let totalQty = 0;
   let totalGrossAmount = 0;
@@ -753,681 +323,101 @@ export const generateHTMLWhenMRPWithGST = (orderId, order) => {
 
     totalGrossAmount += Number(grossAmount);
     if (productData.type === 'Regular') {
-      totalGrossAmount += Number(grossAmount);
       totalTaxableAmount += Number(taxableAmount);
       totalTotalAmount += Number(totalAmount);
       totalGSTAmount += Number(gstAmount);
     }
 
     html += `
-    <tr style="height: 11pt">
-        <td
-          style="
-            width: 137pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-left: 1pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: left;
-            "
-          >
-          ${currProduct.ItemName}
-          </p>
-        </td>
-        <td
-          style="
-            width: 30pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-left: 1pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: left;
-            "
-          >
-          ${currProduct.Unit} ${currProduct.UOM}
-          </p>
-        </td>
-        <td
-          style="
-            width: 24pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-left: 1pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: center;
-            "
-          >
-          ${currProduct.MRP}
-          </p>
-        </td>
-        <td
-          style="
-            width: 30pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="text-indent: 0pt; line-height: 9pt; text-align: center"
-          >
-          ${noOfUnits}
-          </p>
-        </td>
-        <td
-          style="
-            width: 38pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-left: 16pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: left;
-            "
-          >
-          ${productData.quantity}
-          </p>
-        </td>
+
+    <tr>
+      <td class="text-left small-text col-particular no-padding">
+        ${currProduct.ItemName}
+      </td>
+      <td class="text-left small-text col-unit no-padding">
+        ${currProduct.Unit} ${currProduct.UOM}
+      </td>
+      <td class="text-center small-text col-mrp no-padding">
+        ${currProduct.MRP}
+      </td>
+      <td class="text-center small-text col-units no-padding">
+        ${noOfUnits}
+      </td>
+      <td class="text-right small-text col-qty no-padding">
+        ${productData.quantity}
+      </td>
+      
+      <td class="text-right small-text col-gross no-padding">
+        ${grossAmount}
+      </td>
+    
+        
         `;
     if (productData.type === 'Regular') {
       html += `
-      <td
-          style="
-            width: 47pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-right: 1pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: right;
-            "
-          >
-          ${grossAmount}
-          </p>
-        </td>
-        <td
-          style="
-            width: 46pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-right: 1pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: right;
-            "
-          >
-            ${netRate}
-          </p>
-        </td>
-        <td
-          style="
-            width: 48pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-right: 1pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: right;
-            "
-          >
-            ${taxableAmount}
-          </p>
-        </td>
-        <td
-          style="
-            width: 52pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-            <p
-                class="s3"
-                style="
-                padding-right: 1pt;
-                text-indent: 0pt;
-                line-height: 9pt;
-                text-align: right;
-                "
-            >
-                ${gstAmount}
-            </p>
-        </td>
-        <td
-          style="
-            width: 59pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-right: 1pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: right;
-            "
-          >
-            ${totalAmount}
-          </p>
-        </td>
-      </tr>
+      <td class="text-right small-text col-net-rate  no-padding">${netRate}</td> 
+      <td class="text-right small-text col-taxable  no-padding"> ${taxableAmount}</td> 
+      <td class="text-right small-text col-gst  no-padding">${gstAmount}</td>
+      <td class="text-right small-text col-total-amount  no-padding">${totalAmount}</td>
+    </tr>
       
     `;
     } else if (productData.type === 'Free Sample') {
       html += `
-      <td
-          style="
-            width: 87pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-          colspan="4"
-        >
-          <p
-            class="s4"
-            style="
-              padding-left: 1pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: left;
-            "
-          >
-            FREE SAMPLE NOT FOR SALE
-          </p>
-        </td>
-        <td
-          style="
-            width: 59pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-right: 1pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: right;
-            "
-          >
-            0.00
-          </p>
-        </td>
+      <td colspan="3" class="text-left small-text no-padding">
+        Free Sample Not For Sale
+      </td>
+      <td class="text-right small-text col-total-amount no-padding">0.00</td>
       </tr>
     `;
     } else if (productData.type === 'Free Item') {
       html += `
-      <td
-      style="
-        width: 146pt;
-        border-top-style: solid;
-        border-top-width: 1pt;
-        border-left-style: solid;
-        border-left-width: 1pt;
-        border-bottom-style: solid;
-        border-bottom-width: 1pt;
-        border-right-style: solid;
-        border-right-width: 1pt;
-      "
-      colspan="4"
-    >
-      <p
-        class="s4"
-        style="
-          padding-left: 1pt;
-          text-indent: 0pt;
-          line-height: 9pt;
-          text-align: left;
-        "
-      >
-        FREE UNIT
-      </p>
-    </td>
-    <td
-      style="
-        width: 59pt;
-        border-top-style: solid;
-        border-top-width: 1pt;
-        border-left-style: solid;
-        border-left-width: 1pt;
-        border-bottom-style: solid;
-        border-bottom-width: 1pt;
-        border-right-style: solid;
-        border-right-width: 1pt;
-      "
-    >
-      <p
-        class="s3"
-        style="
-          padding-right: 1pt;
-          text-indent: 0pt;
-          line-height: 9pt;
-          text-align: right;
-        "
-      >
-        0.00
-      </p>
-    </td>
-  </tr>
+      <td colspan="3" class="text-left small-text no-padding">Free Unit</td>
+      <td class="text-right small-text col-total-amount no-padding">0.00</td>
+    </tr>
+  
       `;
     }
   });
   html += `
-  <tr style="height: 11pt">
-        <td
-          style="
-            width: 137pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-        <p
-            class="s3"
-            style="
-              padding-left: 1pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: left;
-            "
-          >
-            TOTAL
-          </p>
-        </td>
-        <td
-          style="
-            width: 30pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-        <p style="text-indent: 0pt; text-align: left"><br /></p>
-
-        </td>
-        <td
-          style="
-            width: 24pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p style="text-indent: 0pt; text-align: left"><br /></p>
-        </td>
-        <td
-          style="
-            width: 30pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p style="text-indent: 0pt; text-align: left"><br /></p>
-        </td>
-        <td
-          style="
-            width: 38pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-left: 13pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: left;
-            "
-          >
-            ${totalQty.toFixed(2)}
-          </p>
-        </td>
-        <td
-          style="
-            width: 47pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-right: 1pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: right;
-            "
-          >
-            ${totalGrossAmount.toFixed(2)}
-          </p>
-        </td>
-        <td
-          style="
-            width: 46pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p style="text-indent: 0pt; text-align: left"><br /></p>
-        </td>
-        <td
-          style="
-            width: 48pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-right: 1pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: right;
-            "
-          >
-            ${totalTaxableAmount.toFixed(2)}
-          </p>
-        </td>
-        <td
-          style="
-            width: 52pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-            <p
-                class="s3"
-                style="
-                padding-right: 1pt;
-                text-indent: 0pt;
-                line-height: 9pt;
-                text-align: right;
-                "
-            >
-                ${totalGSTAmount.toFixed(2)}
-            </p>
-        </td>
-        <td
-          style="
-            width: 59pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-right: 1pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: right;
-            "
-          >
-            ${totalTotalAmount.toFixed(2)}
-          </p>
+  <tr>
+        <td class="text-right small-text col-particular  no-padding">TOTAL</td>
+        <td class="text-left small-text col-unit  no-padding"></td> 
+        <td class="text-left small-text col-mrp  no-padding"></td>
+        <td class="text-left small-text col-units  no-padding"></td> 
+        <td class="text-right small-text col-qty  no-padding">${totalQty.toFixed(
+          2,
+        )}</td> 
+        <td class="text-right small-text col-gross  no-padding">${totalGrossAmount.toFixed(
+          2,
+        )}</td>
+        <td class="text-left small-text col-net-rate  no-padding"></td> 
+        <td class="text-right small-text col-taxable  no-padding">${totalTaxableAmount.toFixed(
+          2,
+        )}</td> 
+        <td class="text-right small-text col-gst  no-padding">${totalGSTAmount.toFixed(
+          2,
+        )}</td>
+        <td class="text-right small-text col-total-amount  no-padding">${totalTotalAmount.toFixed(
+          2,
+        )}</td>
+      </tr>
+      <tr>
+        <td colspan="7" class="no-bottom-border"></td>
+        <td colspan="2" class="s2 no-padding">TOTAL R/O </td>
+        <td class="s2 no-padding text-right">${Math.round(
+          totalTotalAmount,
+        ).toFixed(2)}
         </td>
       </tr>
-      <tr style="height: 11pt">
-        <td
-          style="
-            width: 400pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-          colspan="8"
-        >
-          <p style="text-indent: 0pt; text-align: left"><br /></p>
-        </td>
-        <td
-          style="
-            width: 52pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="text-indent: 0pt; line-height: 9pt; text-align: center"
-          >
-            TOTAL R/O
-          </p>
-        </td>
-        <td
-          style="
-            width: 59pt;
-            border-top-style: solid;
-            border-top-width: 1pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-        >
-          <p
-            class="s3"
-            style="
-              padding-right: 1pt;
-              text-indent: 0pt;
-              line-height: 9pt;
-              text-align: right;
-            "
-          >
-            ${Math.round(totalTotalAmount).toFixed(2)}
-          </p>
+      <tr>
+        <td colspan="10" class="no-top-border">
+          <p class="s2 signature bold">For Sanzyme Biologics Private Limited</p>
+          <br />
+          <p class="s2 signature">Authorized Representative</p>
         </td>
       </tr>
-      <tr style="height: 69pt">
-        <td
-          style="
-            width: 511pt;
-            border-left-style: solid;
-            border-left-width: 1pt;
-            border-bottom-style: solid;
-            border-bottom-width: 1pt;
-            border-right-style: solid;
-            border-right-width: 1pt;
-          "
-          colspan="10"
-        >
-          <p style="text-indent: 0pt; text-align: left"><br /></p>
-          <p
-            class="s4"
-            style="padding-right: 13pt; text-indent: 0pt; text-align: right"
-          >
-            For Sanzyme Biologics Private Limited
-          </p>
-          <p style="text-indent: 0pt; text-align: left"><br /></p>
-          <p
-            class="s3"
-            style="padding-right: 30pt; text-indent: 0pt; text-align: right"
-          >
-            Authorized Representative
-          </p>
-        </td>
-      </tr>
+      
     </table>
   </body>
 </html>
