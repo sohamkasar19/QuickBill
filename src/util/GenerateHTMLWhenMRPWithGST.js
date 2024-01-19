@@ -4,7 +4,8 @@ export const generateHTMLWhenMRPWithGST = (orderId, order) => {
   let dealerDetails = order.dealer;
   let productList = order.productList;
 
-  const today = new Date();
+  const now = new Date();
+  const today = new Date(now.getTime() + 330 * 60 * 1000);
   const yyyy = today.getFullYear();
   let mm = today.getMonth() + 1; // Months start at 0!
   let dd = today.getDate();
