@@ -14,6 +14,7 @@ import auth from '@react-native-firebase/auth';
 import {generateOrderId} from '../util/GenerateOrderId';
 import RNFS from 'react-native-fs';
 import {generateHTMLWhenMRPWithGST} from '../util/GenerateHTMLWhenMRPWithGST';
+import storage from '@react-native-firebase/storage';
 
 const OrderReviewScreen = ({route, navigation}) => {
   const {order} = route.params;
@@ -21,6 +22,8 @@ const OrderReviewScreen = ({route, navigation}) => {
   const submitOrder = async () => {
     try {
       const orderId = order.orderId ? order.orderId : generateOrderId();
+
+      await deleteOldPDFs(orderId);
 
       const orderRef = firestore().collection('orders').doc(orderId);
 
@@ -39,23 +42,38 @@ const OrderReviewScreen = ({route, navigation}) => {
       const [productsWithGST, productsWithoutGST] = splitProducts(
         order.productList,
       );
-      let destination1 = 'NA',
-        destination2 = 'NA';
+      let pdfDetailsWithGST = null,
+        pdfDetailsWithoutGST = null;
+
       if (productsWithGST.length > 0) {
-        destination1 = await createPDF(orderId, productsWithGST, 'WithGST');
+        pdfDetailsWithGST = await createPDF(
+          orderId,
+          productsWithGST,
+          'WithGST',
+        );
+        const pdfDetails = await uploadPDF(pdfDetailsWithGST.originalFilePath);
+        await savePDFReferenceInFirestore(pdfDetails, orderId, 'WithGST');
+        await RNFS.unlink(pdfDetailsWithGST.originalFilePath);
       }
       if (productsWithoutGST.length > 0) {
-        destination2 = await createPDF(
+        pdfDetailsWithoutGST = await createPDF(
           orderId,
           productsWithoutGST,
           'WithoutGST',
         );
+        const pdfDetails = await uploadPDF(
+          pdfDetailsWithoutGST.originalFilePath,
+        );
+        await savePDFReferenceInFirestore(pdfDetails, orderId, 'WithoutGST');
+        await RNFS.unlink(pdfDetailsWithoutGST.originalFilePath);
       }
 
       Alert.alert(
         'Success',
-        `PDF saved to \n${destination1 === 'NA' ? '' : destination1} \n${
-          destination2 === 'NA' ? '' : destination2
+        `PDF saved to \n${
+          pdfDetailsWithGST ? pdfDetailsWithGST.destinationFile : ''
+        } \n${
+          pdfDetailsWithoutGST ? pdfDetailsWithoutGST.destinationFile : ''
         }`,
         [
           {
@@ -72,6 +90,98 @@ const OrderReviewScreen = ({route, navigation}) => {
     }
   };
 
+  async function deleteOldPDFs(orderId) {
+    try {
+      const orderRef = firestore().collection('orders').doc(orderId);
+
+      const orderDoc = await orderRef.get();
+      console.log(orderId);
+      if (orderDoc.exists) {
+        const orderData = orderDoc.data();
+
+        if (orderData.pdfs) {
+          // Loop through each key in the pdfs map
+          for (const key in orderData.pdfs) {
+            const pdf = orderData.pdfs[key];
+            if (pdf && pdf.storagePath) {
+              await storage().ref(pdf.storagePath).delete();
+            }
+          }
+
+          // Optionally, update the Firestore document to remove the PDF references
+          await orderRef.update({pdfs: firestore.FieldValue.delete()});
+
+          console.log('Old PDFs deleted');
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting old PDFs:', error);
+      throw new Error('Failed to delete old PDFs');
+    }
+  }
+
+  async function savePDFReferenceInFirestore(pdfDetails, orderId, gstFlag) {
+    try {
+      const orderRef = firestore().collection('orders').doc(orderId);
+
+      // PDF entry
+      const pdfEntry = {
+        url: pdfDetails.downloadURL,
+        storagePath: pdfDetails.storagePath,
+      };
+
+      // Prepare the update object
+      let updateData = {};
+      updateData[`${gstFlag}`] = pdfEntry;
+
+      // Update the order with the new PDF entry
+      await orderRef.set({pdfs: updateData}, {merge: true});
+    } catch (error) {
+      console.error('Error saving PDF reference in Firestore:', error);
+      throw new Error('Failed to save PDF reference in Firestore');
+    }
+  }
+
+  async function uploadPDF(filePath) {
+    // Get the current UTC date and time
+    const now = new Date();
+
+    // Convert to IST (UTC + 5:30)
+    const istTime = new Date(now.getTime() + 330 * 60 * 1000); // 330 minutes for UTC+5:30
+
+    // Format the date
+    const formattedDate = `${istTime.getFullYear()}-${
+      istTime.getMonth() + 1
+    }-${istTime.getDate()}`;
+
+    // Extract the filename
+    const filename = filePath.substring(filePath.lastIndexOf('/') + 1);
+
+    // Set the path with date-based folder
+    const storagePath = `pdfs/${formattedDate}/${filename}`;
+
+    // Upload file to Firebase Storage
+    const uploadTask = storage().ref(storagePath).putFile(filePath);
+
+    return new Promise((resolve, reject) => {
+      uploadTask.on(
+        'state_changed',
+        snapshot => {
+          // snapshot to show upload progress
+        },
+        error => {
+          reject(error);
+        },
+        () => {
+          // Handle successful uploads on complete
+          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+            resolve({downloadURL, storagePath});
+          });
+        },
+      );
+    });
+  }
+
   const splitProducts = products => {
     const productsWithGST = [];
     const productsWithoutGST = [];
@@ -86,6 +196,26 @@ const OrderReviewScreen = ({route, navigation}) => {
 
     return [productsWithGST, productsWithoutGST];
   };
+
+  // async function savePDFReferenceInFirestore(downloadURL, orderId, gstFlag) {
+  //   try {
+  //     const orderRef = firestore().collection('orders').doc(orderId);
+
+  //     // New PDF entry
+  //     const newPDFEntry = {
+  //       url: downloadURL,
+  //       gstFlag: gstFlag,
+  //     };
+
+  //     // Atomically add a new PDF entry to the 'pdfs' array field
+  //     await orderRef.update({
+  //       pdfs: firestore.FieldValue.arrayUnion(newPDFEntry),
+  //     });
+  //   } catch (error) {
+  //     console.error('Error saving PDF reference in Firestore:', error);
+  //     throw new Error('Failed to save PDF reference in Firestore');
+  //   }
+  // }
 
   const createPDF = async (orderId, products, gstFlag) => {
     try {
@@ -104,7 +234,14 @@ const OrderReviewScreen = ({route, navigation}) => {
       }
 
       const currentDate = new Date();
-      const dateStr = currentDate.toISOString().replace(/[:.]/g, '-');
+      // Convert to IST (UTC + 5:30)
+      const istTime = new Date(currentDate.getTime() + 330 * 60 * 1000); // 330 minutes for UTC+5:30
+
+      // Format the date to YYYY-MM-DD
+      const dateStr = `${istTime.getFullYear()}-${(
+        '0' +
+        (istTime.getMonth() + 1)
+      ).slice(-2)}-${('0' + istTime.getDate()).slice(-2)}`;
       const FileName = `order_${order.dealer.DealerName}_${dateStr}_${gstFlag}`;
 
       const options = {
@@ -116,38 +253,34 @@ const OrderReviewScreen = ({route, navigation}) => {
       const destinationPath = RNFS.DownloadDirectoryPath;
 
       const destinationFile = destinationPath + '/' + FileName + '.pdf';
-      RNFS.copyFile(pdf.filePath, destinationFile)
-        .then(result => {
-          // Delete a file on the project path using RNFS.unlink
-          return (
-            RNFS.unlink(pdf.filePath)
-              .then(() => {
-                console.log('FILE DELETED');
-              })
-              // `unlink` will throw an error, if the item to unlink does not exist
-              .catch(err => {
-                console.log(err.message);
-              })
-          );
-        })
-        .catch(err => {
-          console.log('err', err);
-        });
-      // Alert.alert('Success', `PDF saved to ${destinationFile}`, [
-      //   {
-      //     text: 'OK',
-      //     onPress: () => {
-      //       navigation.navigate('Home');
-      //     },
-      //   },
-      // ]);
-      console.log(pdf.filePath);
 
-      return destinationFile;
+      await RNFS.copyFile(pdf.filePath, destinationFile);
+
+      // After the file has been successfully copied, delete the original file
+      // await RNFS.unlink(pdf.filePath);
+
+      console.log('PDF saved to', destinationFile);
+
+      // Return the paths
+      return {
+        destinationFile: destinationFile,
+        originalFilePath: pdf.filePath,
+      };
     } catch (error) {
       console.error(error);
+      throw error; // Throw the error so that the caller knows something went wrong
     }
   };
+
+  async function handleOrderPDF(orderId, htmlContent) {
+    const {destinationFile, originalFilePath} = await createPDF(htmlContent); // Step 1: Generate PDF
+
+    const downloadURL = await uploadPDF(originalFilePath); // Step 2: Upload PDF to Firebase
+
+    await savePDFReferenceInFirestore(downloadURL, orderId); // Step 3: Save reference in Firestore
+
+    await RNFS.unlink(originalFilePath); // Step 4: Delete the original PDF file
+  }
 
   return (
     <ScrollView style={styles.container}>
